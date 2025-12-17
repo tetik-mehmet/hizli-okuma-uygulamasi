@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Exercise2 from "@/app/exercise2/page";
-import Exercises from "@/app/exercises/page";
+import Exercise2 from "@/app/genel/bolum1/exercise2/page";
+import Exercises from "@/app/genel/bolum1/exercises/page";
 import BilmecePage from "@/app/bilmece/page";
 import OdakliOkuma from "@/app/odakli-okuma/page";
 import SagsolPage from "@/app/sagsol/page";

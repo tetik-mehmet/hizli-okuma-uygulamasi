@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Exercise2 from "@/app/exercise2/page";
-import Exercises from "@/app/exercises/page";
+import Exercise2 from "@/app/genel/bolum1/exercise2/page";
+import Exercises from "@/app/genel/bolum1/exercises/page";
 import ResimdeBulPage from "@/app/resimdebul/page";
 import SembolSayma from "@/app/sembol/page";
 import BoslukDoldurma from "@/app/bosluk/page";

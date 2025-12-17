@@ -179,6 +179,18 @@ export default function Exercise5({
 } = {}) {
   const router = useRouter();
   const timeUpAudioRef = useRef(null);
+
+  // Giriş kontrolü
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const authToken = localStorage.getItem("authToken");
+
+    // Giriş kontrolü
+    if (!isLoggedIn || !authToken) {
+      router.push("/login");
+      return;
+    }
+  }, [router]);
   const filteredDatasets = useMemo(() => {
     if (Array.isArray(visibleDatasetIds) && visibleDatasetIds.length > 0) {
       return DATASETS.filter((d) => visibleDatasetIds.includes(d.id));

@@ -11,10 +11,12 @@ export default function OyunKategoriPage() {
   useEffect(() => {
     // Kullanıcının giriş yapıp yapmadığını kontrol et
     const isLoggedIn = localStorage.getItem("isLoggedIn");
-    if (!isLoggedIn) {
+    const authToken = localStorage.getItem("authToken");
+    if (!isLoggedIn || !authToken) {
       router.push("/login");
       return;
     }
+
 
     // Kullanıcı adını al
     const name = localStorage.getItem("userName");

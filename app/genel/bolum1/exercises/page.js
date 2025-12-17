@@ -399,6 +399,21 @@ export default function HızlıOkumaEgzersizi() {
   const timerRef = useRef(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [particleCount, setParticleCount] = useState(0);
+  const [windowSize, setWindowSize] = useState({ width: 1920, height: 1080 });
+
+  // Window boyutlarını al
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      
+      const handleResize = () => {
+        setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      };
+      
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   // Ses dosyasını önceden yükle ve hazırla
   const audioRef = useRef(null);
@@ -646,8 +661,8 @@ export default function HızlıOkumaEgzersizi() {
             key={i}
             className="absolute w-2 h-2 bg-white/20 rounded-full"
             animate={{
-              x: [0, Math.random() * window.innerWidth],
-              y: [0, Math.random() * window.innerHeight],
+              x: [0, Math.random() * windowSize.width],
+              y: [0, Math.random() * windowSize.height],
               opacity: [0, 1, 0],
             }}
             transition={{
@@ -669,8 +684,8 @@ export default function HızlıOkumaEgzersizi() {
       <AnimatePresence>
         {showConfetti && (
           <Confetti
-            width={window.innerWidth}
-            height={window.innerHeight}
+            width={windowSize.width}
+            height={windowSize.height}
             numberOfPieces={300}
             recycle={false}
             colors={["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7"]}

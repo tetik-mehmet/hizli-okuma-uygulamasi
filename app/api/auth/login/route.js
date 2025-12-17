@@ -52,16 +52,28 @@ export async function POST(request) {
 
     console.log("✅ Şifre doğru, giriş yapılıyor");
 
-    // JWT token oluştur
+    // JWT token oluştur (7 gün geçerli)
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       JWT_SECRET,
       {
-        expiresIn: "24h",
+        expiresIn: "7d",
       }
     );
 
     console.log("✅ Kullanıcı giriş yaptı:", { email, userId: user._id });
+
+    // Abonelik durumunu kontrol et
+    let subscriptionStatus = user.subscriptionStatus || "none";
+    if (user.subscriptionEndDate && new Date(user.subscriptionEndDate) < new Date()) {
+      subscriptionStatus = "expired";
+      // Abonelik süresi dolmuşsa durumu güncelle
+      if (user.subscriptionStatus === "active") {
+        user.subscriptionStatus = "expired";
+        user.isSubscribed = false;
+        await user.save();
+      }
+    }
 
     return NextResponse.json({
       message: "Giriş başarılı!",
@@ -71,6 +83,13 @@ export async function POST(request) {
         name: user.name,
         surname: user.surname,
         email: user.email,
+        isSubscribed: user.isSubscribed || false,
+        subscriptionType: user.subscriptionType || null,
+        subscriptionStartDate: user.subscriptionStartDate || null,
+        subscriptionEndDate: user.subscriptionEndDate || null,
+        subscriptionStatus: subscriptionStatus,
+        freeTrialStarted: user.freeTrialStarted || false,
+        freeTrialEndDate: user.freeTrialEndDate || null,
       },
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Eye,
   Clock,
@@ -241,6 +242,7 @@ const TEST_ISIMLERI_6 = [
 ];
 
 export default function Exercise4({ initialSet = 1 }) {
+  const router = useRouter();
   const [currentPhase, setCurrentPhase] = useState("logoSelection"); // logoSelection, instructions, viewing, testing, results
   const [selectedLogoSet, setSelectedLogoSet] = useState(initialSet); // 1, 2, 3, 4, 5 veya 6
   const [timeLeft, setTimeLeft] = useState(10);
@@ -249,6 +251,18 @@ export default function Exercise4({ initialSet = 1 }) {
   const [showResults, setShowResults] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const timerRef = useRef(null);
+
+  // Giriş kontrolü
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const authToken = localStorage.getItem("authToken");
+
+    // Giriş kontrolü
+    if (!isLoggedIn || !authToken) {
+      router.push("/login");
+      return;
+    }
+  }, [router]);
 
   // initialSet prop'u değiştiğinde selectedLogoSet'i güncelle
   useEffect(() => {

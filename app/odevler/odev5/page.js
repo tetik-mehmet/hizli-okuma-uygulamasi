@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Exercise2 from "@/app/exercise2/page";
-import Exercises from "@/app/exercises/page";
+import Exercise2 from "@/app/genel/bolum1/exercise2/page";
+import Exercises from "@/app/genel/bolum1/exercises/page";
 import HayvanKartlari from "@/app/hayvan-kartlari/page";
 import RenkKaybolma from "@/app/renk-kaybolma/page";
 import Ikilemeler from "@/app/ikilemeler/page";
-import KaybolanMetin from "@/app/kaybolan-metin/page";
-import Cabucak from "@/app/cabucak/page";
+import KaybolanMetin from "@/app/genel/bolum1/kaybolan-metin/page";
+import Cabucak from "@/app/genel/bolum1/cabucak/page";
 
 export default function Odev5() {
   const steps = [

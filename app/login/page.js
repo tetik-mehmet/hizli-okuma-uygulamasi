@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { ArrowLeft, Home } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -44,6 +45,14 @@ export default function LoginPage() {
         if (data.user) {
           localStorage.setItem("userName", data.user.name || "");
           localStorage.setItem("userSurname", data.user.surname || "");
+          // Abonelik bilgilerini kaydet
+          localStorage.setItem("isSubscribed", data.user.isSubscribed ? "true" : "false");
+          localStorage.setItem("subscriptionType", data.user.subscriptionType || "");
+          localStorage.setItem("subscriptionEndDate", data.user.subscriptionEndDate || "");
+          localStorage.setItem("subscriptionStatus", data.user.subscriptionStatus || "none");
+          // Ücretsiz deneme bilgilerini kaydet
+          localStorage.setItem("freeTrialStarted", data.user.freeTrialStarted ? "true" : "false");
+          localStorage.setItem("freeTrialEndDate", data.user.freeTrialEndDate || "");
         }
 
         console.log("🚀 Genel sayfasına yönlendiriliyor...");
@@ -68,10 +77,12 @@ export default function LoginPage() {
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 flex flex-col items-center justify-center p-6 text-gray-800 font-sans relative overflow-hidden">
       {/* Arka plan resmi */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/cocuk.png"
-          alt="Arka plan"
-          className="w-full h-full object-cover"
+        <Image
+          src="/login_arka_plan.avif"
+          alt="Giriş sayfası arka planı"
+          fill
+          priority
+          className="object-cover"
         />
         {/* Yarı saydam overlay - okunabilirlik için */}
         <div className="absolute inset-0 bg-black/40"></div>
@@ -79,7 +90,16 @@ export default function LoginPage() {
 
       {/* Ana içerik */}
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo/Brand alanı kaldırıldı */}
+        {/* Ana Sayfaya Dön Butonu */}
+        <Link
+          href="/"
+          className="mb-6 flex items-center gap-2 text-white hover:text-amber-200 transition-colors duration-200 drop-shadow-lg group self-start"
+        >
+          <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 group-hover:bg-white/30 transition-all duration-200">
+            <ArrowLeft className="w-5 h-5" />
+          </div>
+          <span className="font-semibold text-sm sm:text-base">Ana Sayfaya Dön</span>
+        </Link>
 
         {/* Login form kartı */}
         <div className="bg-white/20 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8 relative overflow-hidden">

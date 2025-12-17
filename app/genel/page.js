@@ -7,13 +7,25 @@ export default function GenelPage() {
   const [userName, setUserName] = useState("");
   const [isLoaded, setIsLoaded] = useState(true);
   const [showCards, setShowCards] = useState(true);
+  const [subscriptionInfo, setSubscriptionInfo] = useState({
+    isSubscribed: false,
+    subscriptionType: null,
+    subscriptionEndDate: null,
+    subscriptionStatus: "none",
+  });
   const router = useRouter();
 
   useEffect(() => {
     console.log("🔍 Genel sayfası useEffect başladı");
 
-    // GEÇİCİ: Login kontrollerini kaldır
-    console.log("⚠️ GEÇİCİ: Login kontrolleri kaldırıldı");
+    // Login kontrolü
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const authToken = localStorage.getItem("authToken");
+
+    if (!isLoggedIn || !authToken) {
+      router.push("/login");
+      return;
+    }
 
     // Kullanıcı adını localStorage'dan al (eğer varsa)
     try {
@@ -26,6 +38,19 @@ export default function GenelPage() {
         // Eğer localStorage'da yoksa varsayılan değer
         setUserName("Kullanıcı");
       }
+
+      // Abonelik bilgilerini al
+      const isSubscribed = localStorage.getItem("isSubscribed") === "true";
+      const subscriptionType = localStorage.getItem("subscriptionType");
+      const subscriptionEndDate = localStorage.getItem("subscriptionEndDate");
+      const subscriptionStatus = localStorage.getItem("subscriptionStatus");
+
+      setSubscriptionInfo({
+        isSubscribed,
+        subscriptionType,
+        subscriptionEndDate,
+        subscriptionStatus: subscriptionStatus || "none",
+      });
     } catch (error) {
       console.error("User data error:", error);
       setUserName("Kullanıcı");
@@ -35,7 +60,7 @@ export default function GenelPage() {
     setTimeout(() => {
       setShowCards(false);
     }, 2000);
-  }, []); // router dependency'yi kaldırın
+  }, [router]);
 
   const handleLogout = () => {
     // GEÇİCİ: Logout işlemini basitleştir
@@ -63,7 +88,7 @@ export default function GenelPage() {
           />
         </svg>
       ),
-      link: "/panel",
+      link: "genel/bolum1",
       color: "orange",
       gradient: "from-orange-500 via-orange-600 to-red-600",
       shadow: "shadow-orange-500/30",
@@ -203,28 +228,71 @@ export default function GenelPage() {
         <div className="max-w-7xl mx-auto">
           {/* 3D Header */}
           <div
-            className={`flex justify-between items-center mb-16 transition-all duration-1000 ${
+            className={`mb-16 transition-all duration-1000 ${
               isLoaded
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 -translate-y-10"
             }`}
           >
-            <div className="space-y-4">
-              <h1 className="text-6xl font-black text-white drop-shadow-2xl">
-                Hoş Geldiniz,{" "}
-                <span className="bg-gradient-to-r from-orange-400 via-red-500 to-purple-600 bg-clip-text text-transparent">
-                  {userName}!
-                </span>
-              </h1>
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+              <div className="space-y-4">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white drop-shadow-2xl">
+                  Hoş Geldiniz,{" "}
+                  <span className="bg-gradient-to-r from-orange-400 via-red-500 to-purple-600 bg-clip-text text-transparent">
+                    {userName}!
+                  </span>
+                </h1>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white font-semibold transition-all duration-300 hover:bg-white/20 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30"
+              >
+                <span className="relative z-10">Çıkış Yap</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="group relative px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white font-semibold transition-all duration-300 hover:bg-white/20 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30"
-            >
-              <span className="relative z-10">Çıkış Yap</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
+            {/* Abonelik Durumu Kartı */}
+            {subscriptionInfo.isSubscribed &&
+              subscriptionInfo.subscriptionStatus === "active" && (
+                <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-md border border-green-400/30 rounded-2xl p-6 mb-8">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        Aboneliğiniz Aktif
+                      </h3>
+                      <p className="text-white/80 text-sm sm:text-base">
+                        {subscriptionInfo.subscriptionType === "monthly"
+                          ? "Aylık"
+                          : subscriptionInfo.subscriptionType === "yearly"
+                          ? "Yıllık"
+                          : ""}{" "}
+                        abonelik
+                        {subscriptionInfo.subscriptionEndDate && (
+                          <>
+                            {" - "}
+                            Bitiş Tarihi:{" "}
+                            {new Date(
+                              subscriptionInfo.subscriptionEndDate
+                            ).toLocaleDateString("tr-TR", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => router.push("/subscription-expired")}
+                      className="px-6 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl transition-all duration-300 text-sm sm:text-base"
+                    >
+                      Aboneliği Yenile
+                    </button>
+                  </div>
+                </div>
+              )}
           </div>
 
           {/* 3D Program Cards */}

@@ -28,7 +28,6 @@ export default function Panel() {
       return;
     }
 
-
     setUserName(name || "");
     setUserSurname(surname || "");
     setIsLoading(false);
@@ -46,7 +45,7 @@ export default function Panel() {
       aciklama: "Kelimeleri hızlıca görüp tanıma alıştırması",
       icon: <BookOpen className="w-8 h-8" />,
       renk: "from-blue-500 to-purple-600",
-      yol: "genel/bolum1/exercises",
+      yol: "/genel/bolum1/exercises",
     },
     {
       id: 2,
@@ -54,7 +53,7 @@ export default function Panel() {
       aciklama: "8 şeklinde hareket eden balık ile göz takibi",
       icon: <Eye className="w-8 h-8" />,
       renk: "from-orange-500 to-red-600",
-      yol: "genel/bolum1/exercise2",
+      yol: "/genel/bolum1/exercise2",
     },
     {
       id: 3,
@@ -62,7 +61,7 @@ export default function Panel() {
       aciklama: "Çeşitli hızlı okuma alıştırmaları",
       icon: <Target className="w-8 h-8" />,
       renk: "from-green-500 to-teal-600",
-      yol: "genel/bolum1/exercise3",
+      yol: "/genel/bolum1/exercise3",
     },
     {
       id: 4,
@@ -70,7 +69,7 @@ export default function Panel() {
       aciklama: "Hafıza ve konsantrasyon becerilerini geliştiren egzersizler",
       icon: <Brain className="w-8 h-8" />,
       renk: "from-pink-500 to-rose-600",
-      yol: "genel/bolum1/hafiza",
+      yol: "/genel/bolum1/hafiza",
     },
     {
       id: 5,
@@ -78,7 +77,7 @@ export default function Panel() {
       aciklama: "Kişiselleştirilmiş ve gelişmiş hızlı okuma teknikleri",
       icon: <Target className="w-8 h-8" />,
       renk: "from-yellow-500 to-orange-600",
-      yol: "genel/bolum1/ozel", // /exercise4'ten /ozel'e değiştirildi
+      yol: "/genel/bolum1/ozel",
     },
     {
       id: 6,
@@ -86,7 +85,7 @@ export default function Panel() {
       aciklama: "Hızlıca gör ve tanı alıştırması",
       icon: <Eye className="w-8 h-8" />,
       renk: "from-indigo-500 to-blue-600",
-      yol: "genel/bolum1/cabucak",
+      yol: "/genel/bolum1/cabucak",
     },
     {
       id: 7,
@@ -94,7 +93,7 @@ export default function Panel() {
       aciklama: "Metinleri hızlıca okuyup hatırlama alıştırması",
       icon: <BookOpen className="w-8 h-8" />,
       renk: "from-emerald-500 to-green-600",
-      yol: "genel/bolum1/kaybolan-metin",
+      yol: "/genel/bolum1/kaybolan-metin",
     },
   ];
 
