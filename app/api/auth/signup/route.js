@@ -7,13 +7,19 @@ export async function POST(request) {
   try {
     await connectDB();
 
-    const { name, surname, email, password } = await request.json();
+    let { name, surname, email, password } = await request.json();
+
+    // Email'i normalize et (lowercase ve trim)
+    email = email.trim().toLowerCase();
+    name = name.trim();
+    surname = surname.trim();
+    password = password.trim();
 
     console.log("=== SIGNUP DEBUG ===");
     console.log("Signup isteği alındı:", { email, name, surname });
 
     // Email kontrolü
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       console.log("❌ Kullanıcı zaten mevcut:", email);
       return NextResponse.json(

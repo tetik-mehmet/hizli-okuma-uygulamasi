@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, Home } from "lucide-react";
@@ -12,6 +12,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Eğer kullanıcı zaten giriş yapmışsa genel sayfasına yönlendir
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const authToken = localStorage.getItem("authToken");
+    
+    if (isLoggedIn === "true" && authToken) {
+      router.replace("/genel");
+    }
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,8 +67,8 @@ export default function LoginPage() {
 
         console.log("🚀 Genel sayfasına yönlendiriliyor...");
 
-        // Router ile yönlendirme
-        router.push("/genel");
+        // replace kullanarak geri tuşuyla login sayfasına dönülemeyecek şekilde yönlendir
+        router.replace("/genel");
       } else {
         console.log("❌ Login failed:", data.message);
         setError(
@@ -163,15 +173,17 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Forgot password link */}
-              <div className="flex justify-end">
-                <Link
-                  href="/forgot-password"
-                  className="text-amber-700 text-sm hover:text-amber-800 hover:underline transition-colors duration-200 drop-shadow-sm"
-                  style={{ fontFamily: "var(--font-family)" }}
-                >
-                  Giriş yapmakta sorun mu yaşıyorsunuz?
-                </Link>
+              {/* Hesabınız yoksa üye ol */}
+              <div className="text-center">
+                <p className="text-amber-800 text-sm mb-1">
+                  Hesabınız yoksa{" "}
+                  <Link
+                    href="/signup"
+                    className="font-semibold text-amber-900 hover:text-amber-950 hover:underline transition-colors duration-200"
+                  >
+                    üye ol
+                  </Link>
+                </p>
               </div>
 
               {/* Submit button */}

@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   BookOpen,
   Target,
@@ -15,9 +16,20 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function OdakSayfasi() {
+  const router = useRouter();
   const [hoveredButton, setHoveredButton] = useState(null);
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/odak");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
 
   const egzersizKategorileri = [
     {

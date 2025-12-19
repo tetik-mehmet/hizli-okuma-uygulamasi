@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function GenelPage() {
   const [userName, setUserName] = useState("");
@@ -17,6 +18,13 @@ export default function GenelPage() {
 
   useEffect(() => {
     console.log("🔍 Genel sayfası useEffect başladı");
+
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
 
     // Login kontrolü
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -63,9 +71,24 @@ export default function GenelPage() {
   }, [router]);
 
   const handleLogout = () => {
-    // GEÇİCİ: Logout işlemini basitleştir
-    console.log("⚠️ GEÇİCİ: Logout işlemi basitleştirildi");
-    router.push("/login");
+    // Tüm localStorage verilerini temizle
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userSurname");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userPackages");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("isSubscribed");
+    localStorage.removeItem("subscriptionType");
+    localStorage.removeItem("subscriptionStartDate");
+    localStorage.removeItem("subscriptionEndDate");
+    localStorage.removeItem("subscriptionStatus");
+    localStorage.removeItem("freeTrialStarted");
+    localStorage.removeItem("freeTrialEndDate");
+    
+    // replace kullanarak geri tuşuyla dönülemeyecek şekilde yönlendir
+    router.replace("/login");
   };
 
   const programs = [
@@ -297,76 +320,90 @@ export default function GenelPage() {
 
           {/* 3D Program Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {programs.map((program, index) => (
-              <Link
-                key={program.id}
-                href={program.link}
-                className={`group block transition-all duration-1000 ${
-                  isLoaded
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                } cursor-pointer`}
-                style={{ transitionDelay: `${index * 200}ms` }}
-              >
-                <div className="relative h-[500px] perspective-1000">
-                  {/* 3D Card Container */}
-                  <div className="relative w-full h-full transform-style-preserve-3d transition-all duration-700 group-hover:rotate-y-12 group-hover:rotate-x-5">
-                    {/* Main Card Face */}
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${program.gradient} rounded-3xl p-8 shadow-2xl ${program.shadow} group-hover:${program.glow} group-hover:-translate-y-6 group-hover:scale-105 transition-all duration-500 transform`}
-                    >
-                      {/* 3D Depth Layers */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-3xl"></div>
-                      <div className="absolute inset-2 bg-gradient-to-br from-black/10 to-transparent rounded-2xl"></div>
+            {programs.map((program, index) => {
+              const handleProgramClick = (e) => {
+                e.preventDefault();
+                const accessCheck = checkPageAccess(`/${program.link}`);
+                if (!accessCheck.hasAccess) {
+                  router.push(
+                    accessCheck.redirectPath || "/subscription-expired"
+                  );
+                  return;
+                }
+                router.push(`/${program.link}`);
+              };
 
-                      {/* Content */}
-                      <div className="relative z-10 flex flex-col items-center text-center space-y-8 h-full">
-                        {/* 3D Icon Container */}
-                        <div className="relative">
-                          <div
-                            className={`p-8 rounded-3xl bg-gradient-to-r ${program.gradient} shadow-2xl group-hover:shadow-3xl group-hover:scale-110 group-hover:rotate-6 group-hover:-translate-y-2 transition-all duration-500 transform`}
-                          >
-                            <div className="text-white drop-shadow-lg">
-                              {program.icon}
+              return (
+                <div
+                  key={program.id}
+                  onClick={handleProgramClick}
+                  className={`group block transition-all duration-1000 ${
+                    isLoaded
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  } cursor-pointer`}
+                  style={{ transitionDelay: `${index * 200}ms` }}
+                >
+                  <div className="relative h-[500px] perspective-1000">
+                    {/* 3D Card Container */}
+                    <div className="relative w-full h-full transform-style-preserve-3d transition-all duration-700 group-hover:rotate-y-12 group-hover:rotate-x-5">
+                      {/* Main Card Face */}
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${program.gradient} rounded-3xl p-8 shadow-2xl ${program.shadow} group-hover:${program.glow} group-hover:-translate-y-6 group-hover:scale-105 transition-all duration-500 transform`}
+                      >
+                        {/* 3D Depth Layers */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-3xl"></div>
+                        <div className="absolute inset-2 bg-gradient-to-br from-black/10 to-transparent rounded-2xl"></div>
+
+                        {/* Content */}
+                        <div className="relative z-10 flex flex-col items-center text-center space-y-8 h-full">
+                          {/* 3D Icon Container */}
+                          <div className="relative">
+                            <div
+                              className={`p-8 rounded-3xl bg-gradient-to-r ${program.gradient} shadow-2xl group-hover:shadow-3xl group-hover:scale-110 group-hover:rotate-6 group-hover:-translate-y-2 transition-all duration-500 transform`}
+                            >
+                              <div className="text-white drop-shadow-lg">
+                                {program.icon}
+                              </div>
+                            </div>
+                            {/* Icon Glow Effect */}
+                            <div
+                              className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${program.gradient} blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500`}
+                            ></div>
+                          </div>
+
+                          {/* Text Content */}
+                          <div className="space-y-6 flex-1 flex flex-col justify-center">
+                            <h3 className="text-3xl font-bold text-white drop-shadow-lg group-hover:text-white transition-colors duration-300">
+                              {program.title}
+                            </h3>
+                            <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-lg">
+                              {program.description}
+                            </p>
+                          </div>
+
+                          {/* 3D Button */}
+                          <div className="w-full">
+                            <div className="relative w-full py-5 px-8 rounded-2xl bg-white/20 group-hover:shadow-2xl group-hover:scale-105 backdrop-blur-md text-white font-bold text-center transition-all duration-500 transform overflow-hidden border border-white/30">
+                              <span className="relative z-10">Başla</span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                             </div>
                           </div>
-                          {/* Icon Glow Effect */}
-                          <div
-                            className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${program.gradient} blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500`}
-                          ></div>
                         </div>
 
-                        {/* Text Content */}
-                        <div className="space-y-6 flex-1 flex flex-col justify-center">
-                          <h3 className="text-3xl font-bold text-white drop-shadow-lg group-hover:text-white transition-colors duration-300">
-                            {program.title}
-                          </h3>
-                          <p className="text-white/80 leading-relaxed group-hover:text-white transition-colors duration-300 text-lg">
-                            {program.description}
-                          </p>
-                        </div>
-
-                        {/* 3D Button */}
-                        <div className="w-full">
-                          <div className="relative w-full py-5 px-8 rounded-2xl bg-white/20 group-hover:shadow-2xl group-hover:scale-105 backdrop-blur-md text-white font-bold text-center transition-all duration-500 transform overflow-hidden border border-white/30">
-                            <span className="relative z-10">Başla</span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                          </div>
-                        </div>
+                        {/* 3D Corner Decorations */}
+                        <div className="absolute top-6 right-6 w-6 h-6 bg-white/30 rounded-full blur-sm"></div>
+                        <div className="absolute bottom-6 left-6 w-4 h-4 bg-white/20 rounded-full blur-sm"></div>
                       </div>
 
-                      {/* 3D Corner Decorations */}
-                      <div className="absolute top-6 right-6 w-6 h-6 bg-white/30 rounded-full blur-sm"></div>
-                      <div className="absolute bottom-6 left-6 w-4 h-4 bg-white/20 rounded-full blur-sm"></div>
+                      {/* Card Shadow */}
+                      <div className="absolute inset-0 bg-black/20 rounded-3xl transform translate-y-4 blur-xl group-hover:translate-y-8 transition-transform duration-500"></div>
                     </div>
-
-                    {/* Card Shadow */}
-                    <div className="absolute inset-0 bg-black/20 rounded-3xl transform translate-y-4 blur-xl group-hover:translate-y-8 transition-transform duration-500"></div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </main>

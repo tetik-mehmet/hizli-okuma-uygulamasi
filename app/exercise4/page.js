@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Brain,
 } from "lucide-react";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 // İlk logo seti için isimler (logolar1.png)
 const LOGO_ISIMLERI_1 = [
@@ -252,7 +253,7 @@ export default function Exercise4({ initialSet = 1 }) {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const timerRef = useRef(null);
 
-  // Giriş kontrolü
+  // Giriş ve erişim kontrolü
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const authToken = localStorage.getItem("authToken");
@@ -260,6 +261,13 @@ export default function Exercise4({ initialSet = 1 }) {
     // Giriş kontrolü
     if (!isLoggedIn || !authToken) {
       router.push("/login");
+      return;
+    }
+
+    // Erişim kontrolü (free-trial kullanıcıları erişebilir)
+    const accessCheck = checkPageAccess("/exercise4");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
       return;
     }
   }, [router]);

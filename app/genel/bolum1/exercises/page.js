@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 const kelimeler = [
   // Mevcut kelimeler
@@ -400,6 +401,15 @@ export default function HızlıOkumaEgzersizi() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [particleCount, setParticleCount] = useState(0);
   const [windowSize, setWindowSize] = useState({ width: 1920, height: 1080 });
+
+  // Erişim kontrolü
+  useEffect(() => {
+    const accessCheck = checkPageAccess("/genel/bolum1/exercises");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
 
   // Window boyutlarını al
   useEffect(() => {

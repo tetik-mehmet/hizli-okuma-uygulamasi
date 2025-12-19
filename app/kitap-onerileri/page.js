@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { GraduationCap, Search, Sparkles } from "lucide-react";
 import {
   FaBookOpen,
@@ -10,10 +11,21 @@ import {
   FaGift,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 const KitapOnerileri = () => {
+  const router = useRouter();
   const [selectedGrade, setSelectedGrade] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/kitap-onerileri");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
 
   const kitapVerileri = {
     "1.SINIF": [

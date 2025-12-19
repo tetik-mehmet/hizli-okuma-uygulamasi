@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function SagsolPage() {
+  const router = useRouter();
   const [showImage, setShowImage] = useState(false);
   const [showExercise, setShowExercise] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -12,6 +15,15 @@ export default function SagsolPage() {
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [currentExerciseData, setCurrentExerciseData] = useState([]);
   const [selectedDuration, setSelectedDuration] = useState(30); // Yeni eklenen state
+
+  // Erişim kontrolü
+  useEffect(() => {
+    const accessCheck = checkPageAccess("/sagsol");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
 
   // İki farklı egzersiz verisi
   const exerciseSets = {

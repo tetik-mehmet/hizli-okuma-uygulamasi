@@ -1,12 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function IngilizcePage() {
+  const router = useRouter();
   const [activeTopic, setActiveTopic] = useState("kisi-zamirleri");
   const [activeSection, setActiveSection] = useState("konu");
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/ingilizce");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
 
   // Konuları gruplara ayıralım
   const topicGroups = {

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Check, Crown, AlertCircle, Sparkles } from "lucide-react";
+import { Check, Crown, AlertCircle, Sparkles, CheckCircle2 } from "lucide-react";
 
 export default function SubscriptionExpiredPage() {
   const router = useRouter();
@@ -10,6 +10,9 @@ export default function SubscriptionExpiredPage() {
   const [freeTrialLoading, setFreeTrialLoading] = useState(false);
   const [error, setError] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState("none");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriptionEndDate, setSubscriptionEndDate] = useState(null);
+  const [subscriptionType, setSubscriptionType] = useState(null);
   const [freeTrialStarted, setFreeTrialStarted] = useState(false);
   const [freeTrialEndDate, setFreeTrialEndDate] = useState(null);
   const [userName, setUserName] = useState("");
@@ -34,7 +37,14 @@ export default function SubscriptionExpiredPage() {
     }
 
     const status = localStorage.getItem("subscriptionStatus");
+    const subscribed = localStorage.getItem("isSubscribed") === "true";
+    const endDate = localStorage.getItem("subscriptionEndDate");
+    const type = localStorage.getItem("subscriptionType");
+    
     setSubscriptionStatus(status || "none");
+    setIsSubscribed(subscribed);
+    setSubscriptionEndDate(endDate);
+    setSubscriptionType(type);
 
     // Ücretsiz deneme durumunu kontrol et
     const freeTrialStartedLocal =
@@ -176,11 +186,13 @@ export default function SubscriptionExpiredPage() {
     localStorage.removeItem("userData");
     localStorage.removeItem("isSubscribed");
     localStorage.removeItem("subscriptionType");
+    localStorage.removeItem("subscriptionStartDate");
     localStorage.removeItem("subscriptionEndDate");
     localStorage.removeItem("subscriptionStatus");
     localStorage.removeItem("freeTrialStarted");
     localStorage.removeItem("freeTrialEndDate");
-    router.push("/login");
+    // replace kullanarak geri tuşuyla dönülemeyecek şekilde yönlendir
+    router.replace("/login");
   };
 
   return (
@@ -196,22 +208,64 @@ export default function SubscriptionExpiredPage() {
           </div>
         )}
 
-        {/* Uyarı Mesajı */}
+        {/* Uyarı/Bilgi Mesajı */}
         <div className="max-w-2xl mx-auto mb-12 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-6">
-            <AlertCircle className="w-10 h-10 text-red-600" />
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Aboneliğiniz Aktif Değil
-          </h1>
-          <p className="text-lg text-gray-600">
-            İçeriklere erişmek için abonelik satın almanız gerekmektedir. Size
-            en uygun planı seçin ve hızlı okuma yolculuğunuza devam edin.
-          </p>
+          {subscriptionStatus === "active" ? (
+            <>
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+                <CheckCircle2 className="w-10 h-10 text-green-600" />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Aboneliğiniz Aktif
+              </h1>
+              <p className="text-lg text-gray-600 mb-4">
+                Tüm içeriklere erişim hakkınız bulunmaktadır. Hızlı okuma
+                yolculuğunuza devam edebilirsiniz.
+              </p>
+              {subscriptionEndDate && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 mt-4">
+                  <p className="text-sm text-gray-600 mb-1">Abonelik Bitiş Tarihi</p>
+                  <p className="text-lg font-semibold text-green-700">
+                    {new Date(subscriptionEndDate).toLocaleDateString("tr-TR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                  {subscriptionType && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      Paket: {subscriptionType === "monthly" ? "Aylık" : subscriptionType === "yearly" ? "Yıllık" : subscriptionType}
+                    </p>
+                  )}
+                </div>
+              )}
+              <div className="mt-6">
+                <Link
+                  href="/genel"
+                  className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  İçeriklere Git
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-6">
+                <AlertCircle className="w-10 h-10 text-red-600" />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Aboneliğiniz Aktif Değil
+              </h1>
+              <p className="text-lg text-gray-600">
+                İçeriklere erişmek için abonelik satın almanız gerekmektedir. Size
+                en uygun planı seçin ve hızlı okuma yolculuğunuza devam edin.
+              </p>
+            </>
+          )}
         </div>
 
-        {/* Ücretsiz Deneme Seçeneği */}
-        {!freeTrialStarted && (
+        {/* Ücretsiz Deneme Seçeneği - Sadece abonelik aktif değilse göster */}
+        {subscriptionStatus !== "active" && !freeTrialStarted && (
           <div className="max-w-2xl mx-auto mb-12">
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 sm:p-8 shadow-lg text-white">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -292,8 +346,9 @@ export default function SubscriptionExpiredPage() {
           </div>
         )}
 
-        {/* Fiyatlandırma Paketleri */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 max-w-5xl mx-auto mb-8">
+        {/* Fiyatlandırma Paketleri - Sadece abonelik aktif değilse göster */}
+        {subscriptionStatus !== "active" && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 max-w-5xl mx-auto mb-8">
           {/* Aylık Paket */}
           <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200">
             <div className="text-center mb-6">
@@ -313,14 +368,57 @@ export default function SubscriptionExpiredPage() {
 
             <ul className="space-y-3 mb-8">
               {[
-                "Tüm hızlı okuma egzersizleri",
-                "Konsantrasyon geliştirme teknikleri",
-                "Anlama oranı artırma alıştırmaları",
-                "7/24 platform erişimi",
-                "İlerleme takibi",
+                "📚 Okuma hızını bilimsel egzersizlerle 3 kata kadar çıkar",
+                "🎯 Dikkatini güçlendirerek odak süreni 2–3 kat uzat",
+                "📈 Okuduğunu anlama oranını %30'a kadar artır",
+                "⏰ 7/24 erişimle istediğin zaman, istediğin yerden pratik yap",
+                "✅ İlerlemeni grafiklerle takip ederek motivasyonunu yüksek tut",
               ].map((feature, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 text-sm sm:text-base">
+                    {feature}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              onClick={() => handlePurchase("monthly")}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-300 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "İşleniyor..." : "Abone Ol"}
+            </button>
+          </div>
+
+          {/* 3 Aylık Paket */}
+          <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-orange-200">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                3 Aylık Paket
+              </h3>
+              <div className="mb-4">
+                <span className="text-4xl sm:text-5xl font-bold text-orange-600">
+                  3699₺
+                </span>
+                <span className="text-gray-600 text-lg ml-2">/3 ay</span>
+              </div>
+              <p className="text-gray-600 text-sm">
+                3 aylık abonelik ile tüm içeriklere erişim
+              </p>
+            </div>
+
+            <ul className="space-y-3 mb-8">
+              {[
+                "📚 3 ay boyunca okuma hızını 3 kata kadar çıkarma fırsatı",
+                "🎯 Düzenli egzersizlerle sınav ve ders çalışırken odaklanma gücünü artır",
+                "📈 Okuduğunu anlama oranını %30'a kadar yükselt",
+                "⏰ 3 ay kesintisiz erişimle her gün kısa pratiklerle zaman kazan",
+                "✅ İlerleme raporlarınla gelişimini net bir şekilde gör",
+              ].map((feature, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700 text-sm sm:text-base">
                     {feature}
                   </span>
@@ -338,30 +436,30 @@ export default function SubscriptionExpiredPage() {
           </div>
 
           {/* Yıllık Paket - Öne Çıkan */}
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-6 sm:p-8 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 border-2 border-orange-400 relative transform scale-105 sm:scale-100">
+          <div className="bg-gradient-to-br from-orange-50 via-white to-orange-50 p-6 sm:p-8 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 border-2 border-orange-200 relative transform scale-105 sm:scale-100">
             {/* Popüler Badge */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="bg-yellow-400 text-orange-900 px-4 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+              <span className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
                 <Crown className="w-4 h-4" />
                 Popüler
               </span>
             </div>
 
             <div className="text-center mb-6">
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              <h3 className="text-2xl sm:text-3xl font-bold text-orange-700 mb-2">
                 Yıllık Paket
               </h3>
               <div className="mb-4">
-                <span className="text-4xl sm:text-5xl font-bold text-white">
+                <span className="text-4xl sm:text-5xl font-bold text-orange-600">
                   13999₺
                 </span>
-                <span className="text-orange-100 text-lg ml-2">/yıl</span>
+                <span className="text-gray-600 text-lg ml-2">/yıl</span>
               </div>
-              <p className="text-orange-100 text-sm">
-                Yıllık abonelik ile avantajlı fiyat
+              <p className="text-gray-600 text-sm">
+                Yıllık abonelik ile %15 tasarruf edin
               </p>
-              <div className="mt-2 inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                <span className="text-white text-xs font-semibold">
+              <div className="mt-2 inline-block bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
+                <span className="text-orange-700 text-xs font-semibold">
                   Aylık 1166₺&apos;ye denk gelir
                 </span>
               </div>
@@ -369,27 +467,27 @@ export default function SubscriptionExpiredPage() {
 
             <ul className="space-y-3 mb-8">
               {[
-                "Tüm hızlı okuma egzersizleri",
-                "Konsantrasyon geliştirme teknikleri",
-                "Anlama oranı artırma alıştırmaları",
-                "7/24 platform erişimi",
-                "İlerleme takibi",
-                "Öncelikli destek",
+                "📚 12 ay boyunca okuma hızını 3–5 kata kadar çıkarma imkânı",
+                "🎯 Uzun vadeli programla odaklanma ve dikkat süreni kalıcı olarak artır",
+                "📈 Okuduğunu anlama oranını yıl boyunca düzenli egzersizlerle %30'a kadar yükselt",
+                "⏰ Yıl boyu sınırsız erişimle her gün sadece 15–20 dakikada zaman kazan",
+                "✅ Detaylı ilerleme raporlarıyla gelişimini adım adım takip et",
+                "🤝 Öncelikli destekle sorularına daha hızlı yanıt al",
               ].map((feature, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-white text-sm sm:text-base">
+                  <Check className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-800 text-sm sm:text-base">
                     {feature}
                   </span>
                 </li>
               ))}
               <li className="flex items-start gap-3">
-                <Check className="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" />
+                <Check className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                 <a
                   href="https://hipnodilakademi.net/danismanlik"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white text-sm sm:text-base underline underline-offset-2 decoration-yellow-300 hover:text-yellow-200 transition-colors"
+                  className="text-orange-700 text-sm sm:text-base underline underline-offset-2 decoration-orange-300 hover:text-orange-800 transition-colors"
                 >
                   Hipnodil Akademi öğrenci danışmanlık merkezinden %10 indirim
                   fırsatı
@@ -400,12 +498,13 @@ export default function SubscriptionExpiredPage() {
             <button
               onClick={() => handlePurchase("yearly")}
               disabled={loading}
-              className="w-full bg-white text-orange-600 font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-300 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "İşleniyor..." : "Abone Ol"}
             </button>
           </div>
         </div>
+        )}
 
         {/* Hata Mesajı */}
         {error && (

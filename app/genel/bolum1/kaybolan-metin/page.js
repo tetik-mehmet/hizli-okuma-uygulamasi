@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function KaybolanMetin() {
   const router = useRouter();
@@ -10,6 +11,15 @@ export default function KaybolanMetin() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(200); // milisaniye
   const [selectedText, setSelectedText] = useState(0);
+
+  // Erişim kontrolü
+  useEffect(() => {
+    const accessCheck = checkPageAccess("/genel/bolum1/kaybolan-metin");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
 
   const metinler = [
     {

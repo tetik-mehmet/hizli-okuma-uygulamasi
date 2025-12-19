@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function OyunKategoriPage() {
   const [userName, setUserName] = useState("");
@@ -9,6 +10,13 @@ export default function OyunKategoriPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/oyunkategori");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+
     // Kullanıcının giriş yapıp yapmadığını kontrol et
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const authToken = localStorage.getItem("authToken");
@@ -30,11 +38,24 @@ export default function OyunKategoriPage() {
   }, [router]);
 
   const handleLogout = () => {
+    // Tüm localStorage verilerini temizle
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("authToken");
     localStorage.removeItem("userToken");
     localStorage.removeItem("userName");
     localStorage.removeItem("userSurname");
-    router.push("/login");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userPackages");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("isSubscribed");
+    localStorage.removeItem("subscriptionType");
+    localStorage.removeItem("subscriptionStartDate");
+    localStorage.removeItem("subscriptionEndDate");
+    localStorage.removeItem("subscriptionStatus");
+    localStorage.removeItem("freeTrialStarted");
+    localStorage.removeItem("freeTrialEndDate");
+    // replace kullanarak geri tuşuyla dönülemeyecek şekilde yönlendir
+    router.replace("/login");
   };
 
   const oyunKategorileri = [

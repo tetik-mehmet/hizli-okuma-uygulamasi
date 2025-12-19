@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Brain,
 } from "lucide-react";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function Panel() {
   const router = useRouter();
@@ -18,6 +19,13 @@ export default function Panel() {
 
   // Sayfa yüklendiğinde giriş ve abonelik kontrolü
   useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel/bolum1");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const authToken = localStorage.getItem("authToken");
     const name = localStorage.getItem("userName");
