@@ -39,7 +39,7 @@ export default function OdakSayfasi() {
       icon: BookOpen,
       renk: "from-blue-500 to-cyan-500",
       hoverRenk: "from-blue-600 to-cyan-600",
-      link: "/paragrafegzersiz",
+      link: "/genel/odak/paragrafegzersiz",
     },
     {
       id: "dilbilgisi",
@@ -48,7 +48,7 @@ export default function OdakSayfasi() {
       icon: FileText,
       renk: "from-green-500 to-emerald-500",
       hoverRenk: "from-green-600 to-emerald-600",
-      link: "/dilbilgisi",
+      link: "/genel/odak/dilbilgisi",
     },
     {
       id: "heceleme",
@@ -57,7 +57,7 @@ export default function OdakSayfasi() {
       icon: Scissors,
       renk: "from-purple-500 to-pink-500",
       hoverRenk: "from-purple-600 to-pink-600",
-      link: "/heceleme",
+      link: "/genel/odak/heceleme",
     },
     {
       id: "boslukdoldurma",
@@ -67,7 +67,7 @@ export default function OdakSayfasi() {
       icon: Target,
       renk: "from-orange-500 to-red-500",
       hoverRenk: "from-orange-600 to-red-600",
-      link: "/bosluk",
+      link: "/genel/odak/bosluk",
     },
     {
       id: "esanlamli",
@@ -77,7 +77,7 @@ export default function OdakSayfasi() {
       icon: Brain,
       renk: "from-indigo-500 to-blue-500",
       hoverRenk: "from-indigo-600 to-blue-600",
-      link: "/esanlamli",
+      link: "/genel/odak/esanlamli",
     },
     {
       id: "gorselyorumlama",
@@ -87,7 +87,7 @@ export default function OdakSayfasi() {
       icon: Image,
       renk: "from-teal-500 to-green-500",
       hoverRenk: "from-teal-600 to-green-600",
-      link: "/gorsel-yorumlama",
+      link: "/genel/odak/gorsel-yorumlama",
     },
     {
       id: "ikilemeler",
@@ -97,7 +97,7 @@ export default function OdakSayfasi() {
       icon: Zap,
       renk: "from-yellow-500 to-amber-500",
       hoverRenk: "from-yellow-600 to-amber-600",
-      link: "/ikilemeler",
+      link: "/genel/odak/ikilemeler",
     },
     {
       id: "bulkaybet",
@@ -107,7 +107,7 @@ export default function OdakSayfasi() {
       icon: Search,
       renk: "from-rose-500 to-pink-500",
       hoverRenk: "from-rose-600 to-pink-600",
-      link: "/renk-kaybolma",
+      link: "/genel/odak/renk-kaybolma",
     },
     {
       id: "hayvankartlari",
@@ -117,7 +117,7 @@ export default function OdakSayfasi() {
       icon: Eye,
       renk: "from-emerald-500 to-teal-500",
       hoverRenk: "from-emerald-600 to-teal-600",
-      link: "/hayvan-kartlari",
+      link: "/genel/odak/hayvan-kartlari",
     },
   ];
 

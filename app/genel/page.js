@@ -86,7 +86,7 @@ export default function GenelPage() {
     localStorage.removeItem("subscriptionStatus");
     localStorage.removeItem("freeTrialStarted");
     localStorage.removeItem("freeTrialEndDate");
-    
+
     // replace kullanarak geri tuşuyla dönülemeyecek şekilde yönlendir
     router.replace("/login");
   };
@@ -136,7 +136,7 @@ export default function GenelPage() {
           />
         </svg>
       ),
-      link: "/ingilizce",
+      link: "genel/ingilizce",
       color: "blue",
       gradient: "from-blue-500 via-blue-600 to-indigo-600",
       shadow: "shadow-blue-500/30",
@@ -161,7 +161,7 @@ export default function GenelPage() {
           />
         </svg>
       ),
-      link: "/odak",
+      link: "genel/odak",
       color: "green",
       gradient: "from-green-500 via-green-600 to-emerald-600",
       shadow: "shadow-green-500/30",
@@ -186,7 +186,7 @@ export default function GenelPage() {
           />
         </svg>
       ),
-      link: "/oyunkategori",
+      link: "genel/oyunkategori",
       color: "purple",
       gradient: "from-purple-500 via-purple-600 to-pink-600",
       shadow: "shadow-purple-500/30",
@@ -212,7 +212,7 @@ export default function GenelPage() {
           />
         </svg>
       ),
-      link: "/kitap-onerileri",
+      link: "genel/kitap-onerileri",
       color: "amber",
       gradient: "from-amber-500 via-yellow-600 to-orange-600",
       shadow: "shadow-amber-500/30",
