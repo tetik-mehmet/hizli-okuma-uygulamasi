@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 const MIN_HIZ_MS = 150;
 const MAX_HIZ_MS = 1200;
@@ -137,6 +138,17 @@ const cumleler = [
 ];
 
 export default function CabucakCumleEgzersizi() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel/bolum1/cabucak");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
+
   const [basladi, setBasladi] = useState(false);
   const [duraklatildi, setDuraklatildi] = useState(false);
   const [bitis, setBitis] = useState(false);
@@ -398,18 +410,8 @@ export default function CabucakCumleEgzersizi() {
     }
   };
 
-  const router = useRouter();
-
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50">
-      {/* Geri Dön Butonu - Sol üst köşe */}
-      <button
-        onClick={() => router.push("/panel")}
-        className="fixed top-6 left-6 z-50 bg-black/50 backdrop-blur-xl px-4 py-3 rounded-full shadow-lg text-white font-bold text-sm border border-white/20 hover:bg-black/70 transition-all duration-300 flex items-center gap-2"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Geri Dön
-      </button>
       {/* Seçim ekranı */}
       {!basladi && !bitis && (
         <div className="w-full max-w-2xl mx-auto bg-white/70 backdrop-blur-md rounded-3xl shadow-xl border border-white p-8">

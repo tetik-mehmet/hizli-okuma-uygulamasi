@@ -1,7 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 const DATASETS = [
   // Alıştırma 1 (ilk görsel)
@@ -177,7 +176,6 @@ export default function Exercise5({
   defaultId,
   embedded,
 } = {}) {
-  const router = useRouter();
   const timeUpAudioRef = useRef(null);
 
   // Giriş kontrolü
@@ -187,10 +185,10 @@ export default function Exercise5({
 
     // Giriş kontrolü
     if (!isLoggedIn || !authToken) {
-      router.push("/login");
+      window.location.href = "/login";
       return;
     }
-  }, [router]);
+  }, []);
   const filteredDatasets = useMemo(() => {
     if (Array.isArray(visibleDatasetIds) && visibleDatasetIds.length > 0) {
       return DATASETS.filter((d) => visibleDatasetIds.includes(d.id));
@@ -408,10 +406,6 @@ export default function Exercise5({
   const score = getScore();
   const currentDifficulty = DIFFICULTY_LEVELS[difficulty];
 
-  const goBackToOzel = () => {
-    router.push("/ozel");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <audio
@@ -420,28 +414,6 @@ export default function Exercise5({
         preload="auto"
         hidden
       />
-      {/* Geri Dön Butonu - Sol Üst */}
-      <div className="absolute top-4 left-4 z-10">
-        <button
-          onClick={goBackToOzel}
-          className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-lg flex items-center gap-2"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Geri Dön
-        </button>
-      </div>
 
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-6">

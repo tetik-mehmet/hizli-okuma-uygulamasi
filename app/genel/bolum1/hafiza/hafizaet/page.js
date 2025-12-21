@@ -1,7 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function HafizaEt() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel/bolum1/hafiza/hafizaet");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
   const [colorAnswers, setColorAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);

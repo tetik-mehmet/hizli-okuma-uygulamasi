@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Timer, Play, RotateCcw, CheckCircle, Eye, Target } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 const MEVSIM_METNI = `Türkiye'de bir yılda dört mevsim vardır. Bu mevsimler ilkbahar, yaz, sonbahar, kıştır. Her mevsim üç ay sürer. Aralık, ocak, şubat ayları kış mevsimi, mart, nisan, mayıs ayları ilkbahar mevsimi, haziran, temmuz, ağustos ayları yaz mevsimi, eylül, ekim, kasım ayları da sonbahar mevsimidir. İlkbahar mevsiminde güneş hem daha erken doğar, hem de daha geç batar. Bunun için ilkbahar mevsiminde günler uzun olur. Ağaçlar çiçek açar. Her yer yemyeşil olur, bazı hayvanlar kış uykusundan uyanır göçmen kuşlar uzak ülkelerden gelir. İlkbahar mevsiminde sık sık yağmur yağar, gök gürler, şimşek çakar. Ama, sonra hemen güneş açar. İlkbahar mevsimi ne soğuk ne de sıcaktır. İlkbaharda genellikle havalar ılık olur. İnsanlar evlerinde ilkbahar temizliği yaparlar. Yaz mevsimine havalar iyice ısınır. Bütün okullar tatil olur. Denizlerin, göllerin, nehirlerin suyu ısınır. Herkes denizlere, dağlara veya ormanlara koşar. Deniz ve güneş sağlığımız için çok yararlıdır. Yaz mevsiminde meyveler, sebzeler olgunlaşır. Bütün bitkiler biraz daha büyürler. Sonbaharda artık uzun günler yavaş yavaş kısalır. Havalar da artık çok şıcak değildir. Sonbahar mevsiminde çok yamur yağar. Üşümemek için daha kalın elbiseler giyeriz. Tatil biter okullar ve dersler başlar. Kışın havalar iyice soğur. Kış mevsiminde, gündüzler kısa geceler uzundur. Kışın ağaçların hiç yaprağı kalmaz. Sadece çam gibi bazı ağaçlar kışın da yeşil kalır. Kış mevsiminde hasta olmamak ve üşümemek için en kalın elbiselerimizi giyeriz.`;
 
@@ -118,7 +117,6 @@ const ARANAN_KELIME = "mevsim";
 const SURE_LIMITI = 30;
 
 export default function BulmaPage({ visibleIds = null, defaultId = "mevsim" }) {
-  const router = useRouter();
   const [selectedExercise, setSelectedExercise] = useState(
     defaultId || "mevsim"
   );
@@ -245,10 +243,6 @@ export default function BulmaPage({ visibleIds = null, defaultId = "mevsim" }) {
     ).length;
   };
 
-  const goBackToOzel = () => {
-    router.push("/ozel");
-  };
-
   if (!isStarted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
@@ -258,28 +252,6 @@ export default function BulmaPage({ visibleIds = null, defaultId = "mevsim" }) {
           preload="auto"
           hidden
         />
-        {/* Geri Dön Butonu - Sol Üst */}
-        <div className="absolute top-4 left-4 z-10">
-          <button
-            onClick={goBackToOzel}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-lg flex items-center gap-2"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Geri Dön
-          </button>
-        </div>
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -380,28 +352,6 @@ export default function BulmaPage({ visibleIds = null, defaultId = "mevsim" }) {
         preload="auto"
         hidden
       />
-      {/* Geri Dön Butonu - Sol Üst */}
-      <div className="absolute top-4 left-4 z-10">
-        <button
-          onClick={goBackToOzel}
-          className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-lg flex items-center gap-2"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Geri Dön
-        </button>
-      </div>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6">

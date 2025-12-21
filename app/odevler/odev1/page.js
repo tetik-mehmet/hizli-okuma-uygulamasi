@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Exercise2 from "@/app/genel/bolum1/exercise2/page";
 import Exercises from "@/app/genel/bolum1/exercises/page";
-import HeceOzel from "@/app/heceozel/page";
-import BulmaPage from "@/app/bulma/page";
-import YazimPage from "@/app/yazim/page";
-import MemoryGame from "@/app/oyun/page";
+import HeceOzel from "@/app/genel/bolum1/ozel/heceozel/page";
+import BulmaPage from "@/app/genel/bolum1/ozel/bulma/page";
+import YazimPage from "@/app/genel/bolum1/ozel/yazim/page";
+import MemoryGame from "@/app/genel/oyunkategori/oyun/page";
 import ParagrafEgzersizi from "@/app/genel/odak/paragrafegzersiz/page";
 import TekerlemeOkuma from "@/app/tekerleme/page";
 

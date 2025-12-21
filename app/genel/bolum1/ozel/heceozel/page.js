@@ -1,9 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 export default function HeceOzel({ visibleSetKeys = null }) {
-  const router = useRouter();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [timeLeft, setTimeLeft] = useState(50);
@@ -397,10 +395,6 @@ export default function HeceOzel({ visibleSetKeys = null }) {
     }
   };
 
-  const goBackToOzel = () => {
-    router.push("/ozel");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <audio
@@ -409,28 +403,6 @@ export default function HeceOzel({ visibleSetKeys = null }) {
         preload="auto"
         hidden
       />
-      {/* Geri Dön Butonu - Sol Üst */}
-      <div className="absolute top-4 left-4 z-10">
-        <button
-          onClick={goBackToOzel}
-          className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-lg flex items-center gap-2"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Geri Dön
-        </button>
-      </div>
 
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
@@ -867,28 +839,6 @@ export default function HeceOzel({ visibleSetKeys = null }) {
           </div>
         ) : (
           <>
-            {/* Geri Dön Butonu */}
-            <div className="mb-6">
-              <button
-                onClick={goBackToSelection}
-                className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-lg flex items-center gap-2"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                Etkinlik Seçimine Geri Dön
-              </button>
-            </div>
 
             {/* Ana süre göstergesi */}
             {isTimerRunning && (

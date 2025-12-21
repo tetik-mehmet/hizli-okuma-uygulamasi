@@ -1379,15 +1379,6 @@ export default function IkilemelerPage() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={() => router.push("/")}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            Ana Sayfaya Dön
-          </button>
-        </div>
 
         {/* Etkinlik 5 */}
         <div className="bg-white rounded-lg shadow-lg p-6 my-8">

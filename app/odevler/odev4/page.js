@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Exercise2 from "@/app/genel/bolum1/exercise2/page";
 import Exercises from "@/app/genel/bolum1/exercises/page";
-import BilmecePage from "@/app/bilmece/page";
+import BilmecePage from "@/app/genel/oyunkategori/bilmece/page";
 import OdakliOkuma from "@/app/odakli-okuma/page";
-import SagsolPage from "@/app/sagsol/page";
-import TamamlaPage from "@/app/tamamla/page";
+import SagsolPage from "@/app/genel/bolum1/hafiza/sagsol/page";
+import TamamlaPage from "@/app/genel/bolum1/ozel/tamamla/page";
 import GorselYorumlama from "@/app/genel/odak/gorsel-yorumlama/page";
 
 export default function Odev4() {

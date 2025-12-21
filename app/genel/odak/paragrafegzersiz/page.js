@@ -1631,16 +1631,6 @@ export default function ParagrafEgzersizi({
       } bg-gradient-to-br from-blue-50 to-indigo-100 py-8`}
     >
       <div className="max-w-4xl mx-auto px-4">
-        {/* Geri Dön Butonu */}
-        {!embedded && (
-          <Link
-            href="/odak"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
-          >
-            <ArrowLeftIcon className="w-4 h-4 mr-2" />
-            Egzersizlere Dön
-          </Link>
-        )}
 
         <motion.div
           key={mevcutParagraf}

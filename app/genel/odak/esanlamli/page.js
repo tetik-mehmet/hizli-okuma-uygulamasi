@@ -277,10 +277,6 @@ export default function EsAnlamliPage({
     setShowFeedback(false);
   };
 
-  // Ana sayfaya dön
-  const goHome = () => {
-    router.push("/");
-  };
 
   // Sonraki gruba geç
   const nextGroup = () => {

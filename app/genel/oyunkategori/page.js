@@ -25,7 +25,6 @@ export default function OyunKategoriPage() {
       return;
     }
 
-
     // Kullanıcı adını al
     const name = localStorage.getItem("userName");
     const surname = localStorage.getItem("userSurname");
@@ -78,7 +77,7 @@ export default function OyunKategoriPage() {
           />
         </svg>
       ),
-      link: "/oyun",
+      link: "/genel/oyunkategori/oyun",
       color: "blue",
       gradient: "from-blue-500 via-blue-600 to-indigo-600",
       shadow: "shadow-blue-500/30",
@@ -104,7 +103,7 @@ export default function OyunKategoriPage() {
           />
         </svg>
       ),
-      link: "/bilmece",
+      link: "/genel/oyunkategori/bilmece",
       color: "green",
       gradient: "from-green-500 via-green-600 to-emerald-600",
       shadow: "shadow-green-500/30",
@@ -129,11 +128,36 @@ export default function OyunKategoriPage() {
           />
         </svg>
       ),
-      link: "/renk-kaybolma",
+      link: "odak/renk-kaybolma",
       color: "cyan",
       gradient: "from-cyan-500 via-sky-600 to-blue-600",
       shadow: "shadow-cyan-500/30",
       glow: "shadow-cyan-500/50",
+    },
+    {
+      id: 4,
+      title: "Bayrak Bulma",
+      description: "Bayrakları ülkelerle eşleştirin ve hafızanızı geliştirin",
+      icon: (
+        <svg
+          className="w-10 h-10"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
+          />
+        </svg>
+      ),
+      link: "/genel/oyunkategori/bayrak",
+      color: "orange",
+      gradient: "from-orange-500 via-amber-600 to-yellow-600",
+      shadow: "shadow-orange-500/30",
+      glow: "shadow-orange-500/50",
     },
   ];
 

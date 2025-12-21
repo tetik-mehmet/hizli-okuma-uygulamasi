@@ -4,10 +4,10 @@ import { useState } from "react";
 import Exercise2 from "@/app/genel/bolum1/exercise2/page";
 import Exercises from "@/app/genel/bolum1/exercises/page";
 import ResimdeBulPage from "@/app/resimdebul/page";
-import SembolSayma from "@/app/sembol/page";
+import SembolSayma from "@/app/genel/bolum1/ozel/sembol/page";
 import BoslukDoldurma from "@/app/genel/odak/bosluk/page";
 import SiirSayfasi from "@/app/siir/page";
-import MemoryGame from "@/app/oyun/page";
+import MemoryGame from "@/app/genel/oyunkategori/oyun/page";
 
 export default function Odev2() {
   const steps = [

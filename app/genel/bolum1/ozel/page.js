@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 const alistirmalar = [
   {
@@ -24,7 +25,7 @@ const alistirmalar = [
     icon: BookOpen,
     renk: "from-blue-500 to-cyan-500",
     hoverRenk: "from-blue-600 to-cyan-600",
-    link: "/heceozel",
+    link: "/genel/bolum1/ozel/heceozel",
   },
   {
     id: 2,
@@ -33,7 +34,7 @@ const alistirmalar = [
     icon: Search,
     renk: "from-green-500 to-emerald-500",
     hoverRenk: "from-green-600 to-emerald-600",
-    link: "/bulma",
+    link: "/genel/bolum1/ozel/bulma",
   },
   {
     id: 3,
@@ -42,7 +43,7 @@ const alistirmalar = [
     icon: Eye,
     renk: "from-purple-500 to-pink-500",
     hoverRenk: "from-purple-600 to-pink-600",
-    link: "/takip",
+    link: "/genel/bolum1/ozel/takip",
   },
   {
     id: 4,
@@ -51,7 +52,7 @@ const alistirmalar = [
     icon: Type,
     renk: "from-orange-500 to-red-500",
     hoverRenk: "from-orange-600 to-red-600",
-    link: "/exercise5",
+    link: "/genel/bolum1/ozel/exercise5",
   },
   {
     id: 5,
@@ -60,7 +61,7 @@ const alistirmalar = [
     icon: Hash,
     renk: "from-indigo-500 to-blue-500",
     hoverRenk: "from-indigo-600 to-blue-600",
-    link: "/sembol",
+    link: "/genel/bolum1/ozel/sembol",
   },
   {
     id: 6,
@@ -69,7 +70,7 @@ const alistirmalar = [
     icon: PenTool,
     renk: "from-teal-500 to-green-500",
     hoverRenk: "from-teal-600 to-green-600",
-    link: "/yazim",
+    link: "/genel/bolum1/ozel/yazim",
   },
   {
     id: 7,
@@ -79,22 +80,24 @@ const alistirmalar = [
     icon: PenTool,
     renk: "from-rose-500 to-pink-500",
     hoverRenk: "from-rose-600 to-pink-600",
-    link: "/tamamla",
+    link: "/genel/bolum1/ozel/tamamla",
   },
 ];
 
 export default function OzelSayfa() {
   const router = useRouter();
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel/bolum1/ozel");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Geri Dön Butonu - Sol üst köşe */}
-      <button
-        onClick={() => router.push("/panel")}
-        className="fixed top-6 left-6 z-50 bg-black/50 backdrop-blur-xl px-4 py-3 rounded-full shadow-lg text-white font-bold text-sm border border-white/20 hover:bg-black/70 transition-all duration-300 flex items-center gap-2"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Geri Dön
-      </button>
       {/* Header Bölümü */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-orange-600/20"></div>

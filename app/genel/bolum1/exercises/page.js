@@ -651,18 +651,6 @@ export default function HızlıOkumaEgzersizi() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
-      {/* Geri Dön Butonu - Sol üst köşe */}
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        whileHover={{ scale: 1.1, x: -5 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => router.push("/panel")}
-        className="fixed top-6 left-6 z-50 bg-black/50 backdrop-blur-xl px-4 py-3 rounded-full shadow-lg text-white font-bold text-sm border border-white/20 hover:bg-black/70 transition-all duration-300 flex items-center gap-2"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Geri Dön
-      </motion.button>
 
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden">

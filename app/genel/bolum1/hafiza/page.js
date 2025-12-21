@@ -1,23 +1,25 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Brain, Zap, Target, Clock, Star, ArrowLeft } from "lucide-react";
 import { GiBrain } from "react-icons/gi";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function HafizaPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel/bolum1/hafiza");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:bg-gray-900">
-      {/* Geri Dön Butonu - Sol üst köşe */}
-      <button
-        onClick={() => router.push("/panel")}
-        className="fixed top-6 left-6 z-50 bg-black/50 backdrop-blur-xl px-4 py-3 rounded-full shadow-lg text-white font-bold text-sm border border-white/20 hover:bg-black/70 transition-all duration-300 flex items-center gap-2"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Geri Dön
-      </button>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Başlık Bölümü */}
         <div className="text-center mb-16">
@@ -81,7 +83,7 @@ export default function HafizaPage() {
                 </div>
 
                 <Link
-                  href="/exercise4"
+                  href="/genel/bolum1/hafiza/exercise4"
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <Zap className="w-5 h-5 mr-2" />
@@ -155,7 +157,7 @@ export default function HafizaPage() {
                 </div>
 
                 <Link
-                  href="/sagsol"
+                  href="/genel/bolum1/hafiza/sagsol"
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-teal-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <Zap className="w-5 h-5 mr-2" />
@@ -228,7 +230,7 @@ export default function HafizaPage() {
                 </div>
 
                 <Link
-                  href="/hafizaet"
+                  href="/genel/bolum1/hafiza/hafizaet"
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-semibold rounded-xl hover:from-pink-700 hover:to-rose-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <Zap className="w-5 h-5 mr-2" />

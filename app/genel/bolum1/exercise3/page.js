@@ -20,6 +20,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { checkPageAccess } from "@/lib/checkAccess";
 
 const PARAGRAF = `Hızlı okuma, günümüz bilgi çağında oldukça önemli bir beceridir. Her gün karşılaştığımız metinlerin, makalelerin ve kitapların sayısı arttıkça, bu metinleri daha kısa sürede ve daha iyi anlayarak okumak büyük bir avantaj sağlar. Hızlı okuma teknikleri, göz kaslarını güçlendirmek, kelime gruplarını bir arada görmek ve gereksiz iç seslendirmeyi azaltmak gibi yöntemleri içerir. Bu sayede, hem okuma hızınız artar hem de anlama düzeyiniz yükselir. Unutmayın, hızlı okuma sadece daha hızlı göz gezdirmek değil, aynı zamanda okuduğunuzu anlamak ve hatırlamak anlamına gelir. Şimdi bu paragrafı dikkatlice okuyun ve bitirdiğinizde 'Bitti' butonuna basarak okuma sürenizi ölçün. Hedefiniz, her seferinde biraz daha hızlı ve daha iyi anlamak olmalı. Başarılar!`;
 
@@ -484,6 +485,15 @@ const YAZIM_ALISTIRMASI = [
 
 export default function Exercise3() {
   const router = useRouter();
+
+  useEffect(() => {
+    // Erişim kontrolü
+    const accessCheck = checkPageAccess("/genel/bolum1/exercise3");
+    if (!accessCheck.hasAccess) {
+      router.push(accessCheck.redirectPath || "/subscription-expired");
+      return;
+    }
+  }, [router]);
   // Ana state'ler
   const [isStarted, setIsStarted] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -1050,39 +1060,6 @@ export default function Exercise3() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-      {/* Geri Dön Butonu - Sol üst köşe */}
-      <button
-        onClick={() => router.push("/panel")}
-        style={{
-          position: "fixed",
-          top: "24px",
-          left: "24px",
-          zIndex: 1000,
-          background: "rgba(0, 0, 0, 0.5)",
-          backdropFilter: "blur(10px)",
-          padding: "12px 16px",
-          borderRadius: "50px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-          color: "white",
-          fontWeight: "bold",
-          fontSize: "14px",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          transition: "all 0.3s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.background = "rgba(0, 0, 0, 0.7)";
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.background = "rgba(0, 0, 0, 0.5)";
-        }}
-      >
-        <ArrowLeft size={20} />
-        Geri Dön
-      </button>
 
       {/* Mevcut hızlı okuma alıştırması - KALDIRILDI */}
 

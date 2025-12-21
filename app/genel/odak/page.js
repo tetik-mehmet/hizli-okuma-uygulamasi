@@ -13,7 +13,6 @@ import {
   Scissors,
   Image,
   Search,
-  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { checkPageAccess } from "@/lib/checkAccess";
@@ -123,20 +122,6 @@ export default function OdakSayfasi() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Geri Dön Butonu */}
-      <div className="absolute top-6 left-6 z-50">
-        <Link href="/genel">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Geri Dön</span>
-          </motion.button>
-        </Link>
-      </div>
-
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-orange-600/10"></div>

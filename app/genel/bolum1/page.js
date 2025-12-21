@@ -1,14 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  BookOpen,
-  Eye,
-  Target,
-  ArrowRight,
-  ArrowLeft,
-  Brain,
-} from "lucide-react";
+import { BookOpen, Eye, Target, ArrowRight, Brain } from "lucide-react";
 import { checkPageAccess } from "@/lib/checkAccess";
 
 export default function Panel() {
@@ -40,11 +33,6 @@ export default function Panel() {
     setUserSurname(surname || "");
     setIsLoading(false);
   }, [router]);
-
-  // Geri dön fonksiyonu
-  const handleGoBack = () => {
-    router.push("/genel");
-  };
 
   const alistirmalar = [
     {
@@ -141,15 +129,6 @@ export default function Panel() {
               beceriyi hedefler.
             </p>
           </div>
-
-          {/* Geri Dön Butonu */}
-          <button
-            onClick={handleGoBack}
-            className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition-colors duration-200 shadow-md hover:shadow-lg"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Geri Dön</span>
-          </button>
         </div>
 
         {/* Alıştırma Kartları */}
