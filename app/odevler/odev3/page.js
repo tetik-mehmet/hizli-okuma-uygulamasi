@@ -4,7 +4,7 @@ import { useState } from "react";
 import Exercise2 from "@/app/genel/bolum1/exercise2/page";
 import Exercises from "@/app/genel/bolum1/exercises/page";
 import Exercise5 from "@/app/exercise5/page";
-import EsAnlamliPage from "@/app/esanlamli/page";
+import EsAnlamliPage from "@/app/genel/odak/esanlamli/page";
 import HeceOzel from "@/app/heceozel/page";
 import MemoryGame from "@/app/oyun/page";
 import ResimdeBulPage from "@/app/resimdebul/page";

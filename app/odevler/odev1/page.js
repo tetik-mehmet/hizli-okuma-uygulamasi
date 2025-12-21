@@ -7,7 +7,7 @@ import HeceOzel from "@/app/heceozel/page";
 import BulmaPage from "@/app/bulma/page";
 import YazimPage from "@/app/yazim/page";
 import MemoryGame from "@/app/oyun/page";
-import ParagrafEgzersizi from "@/app/paragrafegzersiz/page";
+import ParagrafEgzersizi from "@/app/genel/odak/paragrafegzersiz/page";
 import TekerlemeOkuma from "@/app/tekerleme/page";
 
 export default function Odev1() {

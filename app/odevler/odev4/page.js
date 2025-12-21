@@ -7,7 +7,7 @@ import BilmecePage from "@/app/bilmece/page";
 import OdakliOkuma from "@/app/odakli-okuma/page";
 import SagsolPage from "@/app/sagsol/page";
 import TamamlaPage from "@/app/tamamla/page";
-import GorselYorumlama from "@/app/gorsel-yorumlama/page";
+import GorselYorumlama from "@/app/genel/odak/gorsel-yorumlama/page";
 
 export default function Odev4() {
   const fixedSteps = useMemo(
