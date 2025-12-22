@@ -43,7 +43,7 @@ export async function POST(request) {
     const { subscriptionType } = await request.json();
 
     // Abonelik tipi kontrolü
-    if (!subscriptionType || !["monthly", "yearly"].includes(subscriptionType)) {
+    if (!subscriptionType || !["monthly", "quarterly", "yearly"].includes(subscriptionType)) {
       return NextResponse.json(
         { message: "Geçersiz abonelik tipi." },
         { status: 400 }
@@ -66,6 +66,8 @@ export async function POST(request) {
 
     if (subscriptionType === "monthly") {
       subscriptionEndDate.setDate(subscriptionEndDate.getDate() + 30);
+    } else if (subscriptionType === "quarterly") {
+      subscriptionEndDate.setDate(subscriptionEndDate.getDate() + 90);
     } else if (subscriptionType === "yearly") {
       subscriptionEndDate.setDate(subscriptionEndDate.getDate() + 365);
     }

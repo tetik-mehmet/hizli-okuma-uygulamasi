@@ -15,6 +15,11 @@ import {
   TrendingUp,
   Shield,
   AlertCircle,
+  Eye,
+  Mail,
+  User,
+  Clock,
+  Crown,
 } from "lucide-react";
 
 export default function YonetimPaneli() {
@@ -28,6 +33,8 @@ export default function YonetimPaneli() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [userToView, setUserToView] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -75,7 +82,9 @@ export default function YonetimPaneli() {
       });
 
       if (statsResponse.status === 403) {
-        setError("Bu sayfaya erişim yetkiniz yok. Sadece admin kullanıcılar erişebilir.");
+        setError(
+          "Bu sayfaya erişim yetkiniz yok. Sadece admin kullanıcılar erişebilir."
+        );
         setIsAdmin(false);
         setIsLoading(false);
         return;
@@ -101,7 +110,8 @@ export default function YonetimPaneli() {
       const authToken = localStorage.getItem("authToken");
       const params = new URLSearchParams();
       if (searchTerm) params.append("search", searchTerm);
-      if (filterStatus !== "all") params.append("subscriptionStatus", filterStatus);
+      if (filterStatus !== "all")
+        params.append("subscriptionStatus", filterStatus);
 
       const response = await fetch(`/api/admin/users?${params.toString()}`, {
         headers: {
@@ -137,6 +147,30 @@ export default function YonetimPaneli() {
     } catch (error) {
       console.error("Load stats error:", error);
     }
+  };
+
+  // Abonelik tipine göre bitiş tarihini hesapla
+  const calculateEndDate = (subscriptionType, startDate) => {
+    if (!subscriptionType || !startDate) return "";
+
+    const start = new Date(startDate);
+    const end = new Date(start);
+
+    switch (subscriptionType) {
+      case "monthly":
+        end.setDate(end.getDate() + 30);
+        break;
+      case "quarterly":
+        end.setDate(end.getDate() + 90);
+        break;
+      case "yearly":
+        end.setDate(end.getDate() + 365);
+        break;
+      default:
+        return "";
+    }
+
+    return end.toISOString().split("T")[0];
   };
 
   const handleEdit = (user) => {
@@ -189,7 +223,7 @@ export default function YonetimPaneli() {
       setSuccess("Kullanıcı başarıyla güncellendi!");
       setShowEditModal(false);
       await Promise.all([loadUsers(), loadStats()]);
-      
+
       // Success mesajını 3 saniye sonra temizle
       setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
@@ -198,6 +232,12 @@ export default function YonetimPaneli() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewClick = (user) => {
+    setUserToView(user);
+    setShowViewModal(true);
+    setError("");
   };
 
   const handleDeleteClick = (user) => {
@@ -230,7 +270,7 @@ export default function YonetimPaneli() {
       setShowDeleteModal(false);
       setUserToDelete(null);
       await Promise.all([loadUsers(), loadStats()]);
-      
+
       // Success mesajını 3 saniye sonra temizle
       setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
@@ -248,20 +288,11 @@ export default function YonetimPaneli() {
   };
 
   const getStatusBadge = (user) => {
-    if (user.subscriptionStatus === "active" && user.isSubscribed) {
-      return (
-        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-          Aktif Abonelik
-        </span>
-      );
-    } else if (user.subscriptionStatus === "expired") {
-      return (
-        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-          Süresi Dolmuş
-        </span>
-      );
-    } else if (user.freeTrialStarted) {
-      const endDate = user.freeTrialEndDate ? new Date(user.freeTrialEndDate) : null;
+    // Önce Free Trial kontrolü yap (en yüksek öncelik)
+    if (user.freeTrialStarted) {
+      const endDate = user.freeTrialEndDate
+        ? new Date(user.freeTrialEndDate)
+        : null;
       const now = new Date();
       if (endDate && endDate > now) {
         return (
@@ -276,6 +307,21 @@ export default function YonetimPaneli() {
           </span>
         );
       }
+    }
+
+    // Abonelik durumuna göre badge göster
+    if (user.subscriptionStatus === "active") {
+      return (
+        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+          Aktif Abonelik
+        </span>
+      );
+    } else if (user.subscriptionStatus === "expired") {
+      return (
+        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+          Süresi Dolmuş
+        </span>
+      );
     } else {
       return (
         <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
@@ -283,6 +329,23 @@ export default function YonetimPaneli() {
         </span>
       );
     }
+  };
+
+  // Kullanıcının aktiflik durumunu belirle (subscriptionStatus'a göre)
+  const getIsActiveStatus = (user) => {
+    // Free Trial aktifse
+    if (user.freeTrialStarted) {
+      const endDate = user.freeTrialEndDate
+        ? new Date(user.freeTrialEndDate)
+        : null;
+      const now = new Date();
+      if (endDate && endDate > now) {
+        return true;
+      }
+    }
+
+    // Abonelik durumuna göre
+    return user.subscriptionStatus === "active";
   };
 
   if (isLoading) {
@@ -301,8 +364,12 @@ export default function YonetimPaneli() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-inter flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Erişim Reddedildi</h2>
-          <p className="text-gray-600 mb-6">{error || "Bu sayfaya erişim yetkiniz yok."}</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Erişim Reddedildi
+          </h2>
+          <p className="text-gray-600 mb-6">
+            {error || "Bu sayfaya erişim yetkiniz yok."}
+          </p>
           <button
             onClick={() => router.push("/genel")}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
@@ -325,7 +392,9 @@ export default function YonetimPaneli() {
                 <Shield className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
                 Yönetim Paneli
               </h1>
-              <p className="text-gray-600">Kullanıcıları yönetin ve sistem istatistiklerini görüntüleyin</p>
+              <p className="text-gray-600">
+                Kullanıcıları yönetin ve sistem istatistiklerini görüntüleyin
+              </p>
             </div>
           </div>
 
@@ -350,35 +419,45 @@ export default function YonetimPaneli() {
                 <Users className="w-5 h-5 text-blue-600" />
                 <span className="text-sm text-gray-600">Toplam Kullanıcı</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.totalUsers}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {stats.totalUsers}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-4">
               <div className="flex items-center gap-2 mb-2">
                 <UserCheck className="w-5 h-5 text-green-600" />
                 <span className="text-sm text-gray-600">Aktif Abonelik</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.activeSubscriptions}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {stats.activeSubscriptions}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-4">
               <div className="flex items-center gap-2 mb-2">
                 <UserX className="w-5 h-5 text-red-600" />
                 <span className="text-sm text-gray-600">Süresi Dolmuş</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.expiredSubscriptions}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {stats.expiredSubscriptions}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-5 h-5 text-blue-600" />
                 <span className="text-sm text-gray-600">Free Trial</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.activeFreeTrial}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {stats.activeFreeTrial}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-4">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-purple-600" />
                 <span className="text-sm text-gray-600">Son 7 Gün</span>
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stats.lastWeekUsers}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {stats.lastWeekUsers}
+              </p>
             </div>
           </div>
         )}
@@ -442,13 +521,18 @@ export default function YonetimPaneli() {
                     <td colSpan="5" className="px-4 py-8 text-center">
                       <div className="flex items-center justify-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                        <span className="ml-3 text-gray-600">Yükleniyor...</span>
+                        <span className="ml-3 text-gray-600">
+                          Yükleniyor...
+                        </span>
                       </div>
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                    <td
+                      colSpan="5"
+                      className="px-4 py-8 text-center text-gray-500"
+                    >
                       Kullanıcı bulunamadı
                     </td>
                   </tr>
@@ -461,14 +545,25 @@ export default function YonetimPaneli() {
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm text-gray-500">
+                          {user.email}
+                        </div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">{getStatusBadge(user)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {getStatusBadge(user)}
+                      </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(user.createdAt)}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleViewClick(user)}
+                            className="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded-lg transition-colors"
+                            title="Görüntüle"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => handleEdit(user)}
                             className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-lg transition-colors"
@@ -498,7 +593,9 @@ export default function YonetimPaneli() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-800">Kullanıcı Düzenle</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Kullanıcı Düzenle
+                </h2>
                 <button
                   onClick={() => setShowEditModal(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -509,37 +606,88 @@ export default function YonetimPaneli() {
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ad</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Ad
+                    </label>
                     <input
                       type="text"
                       value={editForm.name}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Soyad</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Soyad
+                    </label>
                     <input
                       type="text"
                       value={editForm.surname}
-                      onChange={(e) => setEditForm({ ...editForm, surname: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, surname: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
                     <input
                       type="email"
                       value={editForm.email}
-                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, email: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Abonelik Durumu</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Abonelik Durumu
+                    </label>
                     <select
                       value={editForm.subscriptionStatus}
-                      onChange={(e) => setEditForm({ ...editForm, subscriptionStatus: e.target.value })}
+                      onChange={(e) => {
+                        const newStatus = e.target.value;
+                        const updatedForm = {
+                          ...editForm,
+                          subscriptionStatus: newStatus,
+                          // Abonelik durumuna göre isSubscribed'ı otomatik güncelle
+                          isSubscribed: newStatus === "active",
+                        };
+
+                        // Eğer aktif yapılıyorsa ve başlangıç tarihi yoksa bugünü ayarla
+                        if (
+                          newStatus === "active" &&
+                          !editForm.subscriptionStartDate
+                        ) {
+                          const today = new Date().toISOString().split("T")[0];
+                          updatedForm.subscriptionStartDate = today;
+
+                          // Eğer abonelik tipi varsa bitiş tarihini hesapla
+                          if (editForm.subscriptionType) {
+                            updatedForm.subscriptionEndDate = calculateEndDate(
+                              editForm.subscriptionType,
+                              today
+                            );
+                          }
+                        }
+
+                        // Eğer expired veya none yapılıyorsa tarihleri temizle
+                        if (newStatus === "expired" || newStatus === "none") {
+                          if (!editForm.subscriptionStartDate) {
+                            updatedForm.subscriptionStartDate = "";
+                          }
+                          if (!editForm.subscriptionEndDate) {
+                            updatedForm.subscriptionEndDate = "";
+                          }
+                        }
+
+                        setEditForm(updatedForm);
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="none">Yok</option>
@@ -552,59 +700,177 @@ export default function YonetimPaneli() {
                       <input
                         type="checkbox"
                         checked={editForm.isSubscribed}
-                        onChange={(e) => setEditForm({ ...editForm, isSubscribed: e.target.checked })}
+                        onChange={(e) => {
+                          const isSubscribed = e.target.checked;
+                          const updatedForm = {
+                            ...editForm,
+                            isSubscribed,
+                            // isSubscribed'a göre subscriptionStatus'u güncelle
+                            subscriptionStatus: isSubscribed
+                              ? "active"
+                              : editForm.subscriptionStatus === "active"
+                              ? "none"
+                              : editForm.subscriptionStatus,
+                          };
+
+                          // Eğer abonelik aktif yapılıyorsa ve başlangıç tarihi yoksa bugünü ayarla
+                          if (isSubscribed && !editForm.subscriptionStartDate) {
+                            const today = new Date()
+                              .toISOString()
+                              .split("T")[0];
+                            updatedForm.subscriptionStartDate = today;
+
+                            // Eğer abonelik tipi varsa bitiş tarihini hesapla
+                            if (editForm.subscriptionType) {
+                              updatedForm.subscriptionEndDate =
+                                calculateEndDate(
+                                  editForm.subscriptionType,
+                                  today
+                                );
+                            }
+                          }
+
+                          setEditForm(updatedForm);
+                        }}
                         className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                       />
-                      <span className="text-sm font-medium text-gray-700">Abonelik Aktif</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Abonelik Aktif
+                      </span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        (Otomatik olarak durum güncellenir)
+                      </span>
                     </label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Abonelik Tipi</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Abonelik Tipi
+                    </label>
                     <select
                       value={editForm.subscriptionType}
-                      onChange={(e) => setEditForm({ ...editForm, subscriptionType: e.target.value })}
+                      onChange={(e) => {
+                        const subscriptionType = e.target.value;
+                        const updatedForm = {
+                          ...editForm,
+                          subscriptionType,
+                        };
+
+                        // Eğer abonelik tipi seçildiyse ve başlangıç tarihi varsa bitiş tarihini hesapla
+                        if (
+                          subscriptionType &&
+                          editForm.subscriptionStartDate
+                        ) {
+                          updatedForm.subscriptionEndDate = calculateEndDate(
+                            subscriptionType,
+                            editForm.subscriptionStartDate
+                          );
+                        } else if (
+                          subscriptionType &&
+                          editForm.subscriptionStatus === "active"
+                        ) {
+                          // Eğer aktifse ama başlangıç tarihi yoksa bugünü ayarla
+                          const today = new Date().toISOString().split("T")[0];
+                          updatedForm.subscriptionStartDate = today;
+                          updatedForm.subscriptionEndDate = calculateEndDate(
+                            subscriptionType,
+                            today
+                          );
+                        }
+
+                        setEditForm(updatedForm);
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Seçiniz</option>
                       <option value="monthly">Aylık</option>
+                      <option value="quarterly">3 Aylık</option>
                       <option value="yearly">Yıllık</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Abonelik Başlangıç</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Abonelik Başlangıç
+                    </label>
                     <input
                       type="date"
                       value={editForm.subscriptionStartDate}
-                      onChange={(e) => setEditForm({ ...editForm, subscriptionStartDate: e.target.value })}
+                      onChange={(e) => {
+                        const startDate = e.target.value;
+                        const updatedForm = {
+                          ...editForm,
+                          subscriptionStartDate: startDate,
+                        };
+
+                        // Eğer abonelik tipi varsa bitiş tarihini hesapla
+                        if (startDate && editForm.subscriptionType) {
+                          updatedForm.subscriptionEndDate = calculateEndDate(
+                            editForm.subscriptionType,
+                            startDate
+                          );
+                        }
+
+                        setEditForm(updatedForm);
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Abonelik Bitiş</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Abonelik Bitiş
+                    </label>
                     <input
                       type="date"
                       value={editForm.subscriptionEndDate}
-                      onChange={(e) => setEditForm({ ...editForm, subscriptionEndDate: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          subscriptionEndDate: e.target.value,
+                        })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {editForm.subscriptionType &&
+                      editForm.subscriptionStartDate && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Otomatik hesaplanan bitiş tarihi:{" "}
+                          {calculateEndDate(
+                            editForm.subscriptionType,
+                            editForm.subscriptionStartDate
+                          )}
+                        </p>
+                      )}
                   </div>
                   <div>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={editForm.freeTrialStarted}
-                        onChange={(e) => setEditForm({ ...editForm, freeTrialStarted: e.target.checked })}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            freeTrialStarted: e.target.checked,
+                          })
+                        }
                         className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                       />
-                      <span className="text-sm font-medium text-gray-700">Free Trial Başlatıldı</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Free Trial Başlatıldı
+                      </span>
                     </label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Free Trial Bitiş</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Free Trial Bitiş
+                    </label>
                     <input
                       type="date"
                       value={editForm.freeTrialEndDate}
-                      onChange={(e) => setEditForm({ ...editForm, freeTrialEndDate: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          freeTrialEndDate: e.target.value,
+                        })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -649,13 +915,20 @@ export default function YonetimPaneli() {
                     <AlertCircle className="w-6 h-6 text-red-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800">Kullanıcıyı Sil</h2>
-                    <p className="text-sm text-gray-600">Bu işlem geri alınamaz</p>
+                    <h2 className="text-xl font-bold text-gray-800">
+                      Kullanıcıyı Sil
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      Bu işlem geri alınamaz
+                    </p>
                   </div>
                 </div>
                 <p className="text-gray-700 mb-6">
-                  <strong>{userToDelete.name} {userToDelete.surname}</strong> ({userToDelete.email}) adlı
-                  kullanıcıyı silmek istediğinizden emin misiniz?
+                  <strong>
+                    {userToDelete.name} {userToDelete.surname}
+                  </strong>{" "}
+                  ({userToDelete.email}) adlı kullanıcıyı silmek istediğinizden
+                  emin misiniz?
                 </p>
                 <div className="flex justify-end gap-3">
                   <button
@@ -689,8 +962,224 @@ export default function YonetimPaneli() {
             </div>
           </div>
         )}
+
+        {/* Kullanıcı Bilgileri Görüntüleme Modalı */}
+        {showViewModal && userToView && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4 flex items-center justify-between rounded-t-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <Eye className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-white">
+                    Kullanıcı Bilgileri
+                  </h2>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setUserToView(null);
+                  }}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-6">
+                {/* Kullanıcı Profil Kartı */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      {userToView.name?.[0]?.toUpperCase()}
+                      {userToView.surname?.[0]?.toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-800">
+                        {userToView.name} {userToView.surname}
+                      </h3>
+                      <p className="text-gray-600 flex items-center gap-2 mt-1">
+                        <Mail className="w-4 h-4" />
+                        {userToView.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="w-4 h-4" />
+                    <span>
+                      Kayıt Tarihi: {formatDate(userToView.createdAt)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Abonelik Bilgileri */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Crown className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-800">
+                        Abonelik Durumu
+                      </h4>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Durum:</span>
+                        <span>{getStatusBadge(userToView)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Aktif:</span>
+                        <span
+                          className={`text-sm font-medium ${
+                            getIsActiveStatus(userToView)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {getIsActiveStatus(userToView) ? "Evet" : "Hayır"}
+                        </span>
+                      </div>
+                      {userToView.subscriptionType && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Tip:</span>
+                          <span className="text-sm font-medium text-gray-800">
+                            {userToView.subscriptionType === "monthly"
+                              ? "Aylık"
+                              : userToView.subscriptionType === "quarterly"
+                              ? "3 Aylık"
+                              : userToView.subscriptionType === "yearly"
+                              ? "Yıllık"
+                              : userToView.subscriptionType}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-800">
+                        Tarih Bilgileri
+                      </h4>
+                    </div>
+                    <div className="space-y-2">
+                      {userToView.subscriptionStartDate && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">
+                            Başlangıç:
+                          </span>
+                          <span className="text-sm font-medium text-gray-800">
+                            {formatDate(userToView.subscriptionStartDate)}
+                          </span>
+                        </div>
+                      )}
+                      {userToView.subscriptionEndDate && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Bitiş:</span>
+                          <span className="text-sm font-medium text-gray-800">
+                            {formatDate(userToView.subscriptionEndDate)}
+                          </span>
+                        </div>
+                      )}
+                      {userToView.freeTrialEndDate && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">
+                            Free Trial Bitiş:
+                          </span>
+                          <span className="text-sm font-medium text-gray-800">
+                            {formatDate(userToView.freeTrialEndDate)}
+                          </span>
+                        </div>
+                      )}
+                      {!userToView.subscriptionStartDate &&
+                        !userToView.subscriptionEndDate &&
+                        !userToView.freeTrialEndDate && (
+                          <span className="text-sm text-gray-500">
+                            Tarih bilgisi yok
+                          </span>
+                        )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Free Trial Bilgisi */}
+                {userToView.freeTrialStarted && (
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-5 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <Clock className="w-5 h-5 text-yellow-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800">
+                          Ücretsiz Deneme
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Free Trial başlatılmış
+                          {userToView.freeTrialEndDate &&
+                            ` - Bitiş: ${formatDate(
+                              userToView.freeTrialEndDate
+                            )}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Özet Bilgiler */}
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <User className="w-5 h-5 text-gray-600" />
+                    Özet Bilgiler
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Kullanıcı ID:</span>
+                      <span className="ml-2 font-mono text-gray-800">
+                        {userToView.id}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Abonelik Durumu:</span>
+                      <span className="ml-2 font-medium text-gray-800">
+                        {userToView.subscriptionStatus || "none"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3 rounded-b-xl">
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setUserToView(null);
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Kapat
+                </button>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    setUserToView(null);
+                    handleEdit(userToView);
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <Edit className="w-4 h-4" />
+                  Düzenle
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-

@@ -1151,7 +1151,7 @@ export default function SubscriptionExpiredPage() {
                   </ul>
 
                   <motion.button
-                    onClick={() => handlePurchase("monthly")}
+                    onClick={() => handlePurchase("quarterly")}
                     disabled={loading}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}

@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   },
   subscriptionType: {
     type: String,
-    enum: ["monthly", "yearly"],
+    enum: ["monthly", "quarterly", "yearly"],
     default: null,
   },
   subscriptionStartDate: {
@@ -63,22 +63,31 @@ const userSchema = new mongoose.Schema({
 let UserModel;
 
 try {
-  // mongoose.models undefined ise (Edge runtime), hata fırlatılır
-  // Bu durumda catch bloğunda model oluşturulur
+  // Model zaten tanımlıysa ve schema güncellenmişse, model'i yeniden oluştur
   if (mongoose.models && mongoose.models.User) {
-    UserModel = mongoose.models.User;
+    const existingModel = mongoose.models.User;
+    const existingSchema = existingModel.schema;
+    const existingEnum = existingSchema.path("subscriptionType")?.enumValues || [];
+    
+    // Eğer quarterly enum'da yoksa model'i yeniden oluştur
+    if (!existingEnum.includes("quarterly")) {
+      console.log("Schema güncellendi, model yeniden oluşturuluyor...");
+      delete mongoose.models.User;
+      UserModel = mongoose.model("User", userSchema);
+    } else {
+      UserModel = existingModel;
+    }
   } else {
+    // Model yoksa yeni oluştur
     UserModel = mongoose.model("User", userSchema);
   }
 } catch (error) {
-  // Edge runtime veya mongoose henüz başlatılmamış
-  // Model API route'larında connectDB sonrası kullanılacak
-  // Şimdilik schema'yı kullanarak model oluşturmayı dene
+  // Hata durumunda mevcut model'i kullan veya yeni oluştur
   try {
-    UserModel = mongoose.model("User", userSchema);
-  } catch (e) {
-    // Son çare: model zaten var, onu al
     UserModel = mongoose.model("User");
+  } catch (e) {
+    // Son çare: yeni model oluştur
+    UserModel = mongoose.model("User", userSchema);
   }
 }
 

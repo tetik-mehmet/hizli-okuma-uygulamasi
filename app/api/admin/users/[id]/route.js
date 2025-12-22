@@ -67,51 +67,189 @@ export async function PUT(request, { params }) {
     }
 
     // Email değişikliği kontrolü (eğer email değiştiriliyorsa, yeni email'in benzersiz olması gerekir)
-    if (email && email !== user.email) {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
+    if (email !== undefined) {
+      // Email boş string olamaz
+      if (email === "" || (email && email.trim() === "")) {
         return NextResponse.json(
-          { message: "Bu e-posta adresi zaten kullanılıyor" },
+          { message: "E-posta adresi boş olamaz" },
           { status: 400 }
         );
       }
-      user.email = email;
+      // Email'i normalize et (trim ve lowercase)
+      const normalizedEmail = email.trim().toLowerCase();
+      // Email değiştiriliyorsa benzersizlik kontrolü yap
+      if (normalizedEmail !== user.email) {
+        const existingUser = await User.findOne({ email: normalizedEmail });
+        if (existingUser) {
+          return NextResponse.json(
+            { message: "Bu e-posta adresi zaten kullanılıyor" },
+            { status: 400 }
+          );
+        }
+        user.email = normalizedEmail;
+      }
     }
 
     // Diğer alanları güncelle
-    if (name !== undefined && name !== null) user.name = name;
-    if (surname !== undefined && surname !== null) user.surname = surname;
-    if (isSubscribed !== undefined) user.isSubscribed = Boolean(isSubscribed);
+    if (name !== undefined && name !== null && name.trim() !== "") {
+      user.name = name.trim();
+    }
+    if (surname !== undefined && surname !== null && surname.trim() !== "") {
+      user.surname = surname.trim();
+    }
+    
+    // isSubscribed ve subscriptionStatus'u tutarlı tutmak için önce subscriptionStatus'u kontrol et
+    // subscriptionStatus değiştiyse isSubscribed'ı ona göre ayarla
+    if (subscriptionStatus !== undefined) {
+      // Enum kontrolü - mongoose validation yapacak ama daha iyi hata mesajı için kontrol ediyoruz
+      const validStatuses = ["active", "expired", "none"];
+      if (!validStatuses.includes(subscriptionStatus)) {
+        return NextResponse.json(
+          { message: `Geçersiz abonelik durumu: ${subscriptionStatus}` },
+          { status: 400 }
+        );
+      }
+      user.subscriptionStatus = subscriptionStatus;
+      
+      // Abonelik durumuna göre isSubscribed'ı otomatik güncelle
+      if (subscriptionStatus === "active") {
+        user.isSubscribed = true;
+      } else if (subscriptionStatus === "expired" || subscriptionStatus === "none") {
+        // Eğer isSubscribed açıkça false olarak gönderilmediyse, duruma göre ayarla
+        if (isSubscribed === undefined) {
+          user.isSubscribed = false;
+        } else {
+          user.isSubscribed = Boolean(isSubscribed);
+        }
+      }
+    } else if (isSubscribed !== undefined) {
+      // Sadece isSubscribed değiştiyse subscriptionStatus'u güncelle
+      user.isSubscribed = Boolean(isSubscribed);
+      if (isSubscribed && user.subscriptionStatus !== "active") {
+        user.subscriptionStatus = "active";
+      } else if (!isSubscribed && user.subscriptionStatus === "active") {
+        user.subscriptionStatus = "none";
+      }
+    }
     if (subscriptionType !== undefined) {
-      user.subscriptionType = subscriptionType === "" ? null : subscriptionType;
+      if (subscriptionType === "") {
+        user.subscriptionType = null;
+      } else {
+        // Enum kontrolü - mongoose validation yapacak ama daha iyi hata mesajı için kontrol ediyoruz
+        const validTypes = ["monthly", "quarterly", "yearly"];
+        if (!validTypes.includes(subscriptionType)) {
+          return NextResponse.json(
+            { message: `Geçersiz abonelik tipi: ${subscriptionType}` },
+            { status: 400 }
+          );
+        }
+        user.subscriptionType = subscriptionType;
+      }
     }
     if (subscriptionStartDate !== undefined) {
-      user.subscriptionStartDate = subscriptionStartDate
-        ? new Date(subscriptionStartDate)
-        : null;
+      if (subscriptionStartDate) {
+        const startDate = new Date(subscriptionStartDate);
+        if (isNaN(startDate.getTime())) {
+          return NextResponse.json(
+            { message: "Geçersiz abonelik başlangıç tarihi formatı" },
+            { status: 400 }
+          );
+        }
+        user.subscriptionStartDate = startDate;
+      } else {
+        user.subscriptionStartDate = null;
+      }
     }
     if (subscriptionEndDate !== undefined) {
-      user.subscriptionEndDate = subscriptionEndDate
-        ? new Date(subscriptionEndDate)
-        : null;
-    }
-    if (subscriptionStatus !== undefined) {
-      user.subscriptionStatus = subscriptionStatus;
+      if (subscriptionEndDate) {
+        const endDate = new Date(subscriptionEndDate);
+        if (isNaN(endDate.getTime())) {
+          return NextResponse.json(
+            { message: "Geçersiz abonelik bitiş tarihi formatı" },
+            { status: 400 }
+          );
+        }
+        user.subscriptionEndDate = endDate;
+      } else {
+        user.subscriptionEndDate = null;
+      }
     }
     if (freeTrialStarted !== undefined) {
       user.freeTrialStarted = Boolean(freeTrialStarted);
     }
     if (freeTrialEndDate !== undefined) {
-      user.freeTrialEndDate = freeTrialEndDate
-        ? new Date(freeTrialEndDate)
-        : null;
+      if (freeTrialEndDate) {
+        const trialEndDate = new Date(freeTrialEndDate);
+        if (isNaN(trialEndDate.getTime())) {
+          return NextResponse.json(
+            { message: "Geçersiz free trial bitiş tarihi formatı" },
+            { status: 400 }
+          );
+        }
+        user.freeTrialEndDate = trialEndDate;
+      } else {
+        user.freeTrialEndDate = null;
+      }
+    }
+
+    // Abonelik tipine göre otomatik tarih hesaplama
+    // Eğer abonelik aktif yapılıyorsa ve gerekli bilgiler varsa tarihleri otomatik hesapla
+    if (
+      (subscriptionStatus === "active" || user.subscriptionStatus === "active") &&
+      user.subscriptionType &&
+      user.isSubscribed
+    ) {
+      // Eğer başlangıç tarihi yoksa bugünü ayarla
+      if (!user.subscriptionStartDate) {
+        user.subscriptionStartDate = new Date();
+      }
+
+      // Eğer bitiş tarihi yoksa veya abonelik tipi değiştiyse yeniden hesapla
+      if (!user.subscriptionEndDate || subscriptionType !== undefined) {
+        const startDate = user.subscriptionStartDate;
+        const endDate = new Date(startDate);
+
+        switch (user.subscriptionType) {
+          case "monthly":
+            endDate.setDate(endDate.getDate() + 30);
+            break;
+          case "quarterly":
+            endDate.setDate(endDate.getDate() + 90);
+            break;
+          case "yearly":
+            endDate.setDate(endDate.getDate() + 365);
+            break;
+        }
+
+        user.subscriptionEndDate = endDate;
+      }
     }
 
     // Validation hatalarını yakalamak için try-catch
     try {
+      // Debug: Kullanıcı verilerini logla
+      console.log("User data before save:", {
+        subscriptionType: user.subscriptionType,
+        subscriptionStatus: user.subscriptionStatus,
+        isSubscribed: user.isSubscribed,
+      });
+      
+      // Debug: Schema'yı kontrol et
+      const schema = User.schema;
+      const subscriptionTypePath = schema.path("subscriptionType");
+      if (subscriptionTypePath) {
+        console.log("SubscriptionType enum values:", subscriptionTypePath.enumValues);
+      }
+      
       await user.save();
     } catch (saveError) {
       console.error("User save validation error:", saveError);
+      console.error("Error details:", {
+        name: saveError.name,
+        message: saveError.message,
+        errors: saveError.errors,
+      });
+      
       if (saveError.name === "ValidationError") {
         const errors = Object.values(saveError.errors).map((err) => err.message);
         return NextResponse.json(

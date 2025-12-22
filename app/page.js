@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import {
   BookOpen,
   Lightbulb,
@@ -363,8 +366,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 text-gray-800 overflow-x-hidden font-inter">
+      {/* Header - Sadece Anasayfada */}
+      <Header />
+
       {/* Hero Section - Modern 2025 Design */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 lg:pt-40 pb-12 sm:pb-16 lg:pb-20 overflow-hidden">
         {/* Arka plan dekoratif elementler */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
@@ -1152,7 +1158,7 @@ export default function Home() {
       </section>
 
       {/* Pricing Section - Fiyatlandırma */}
-      <section className="relative py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-orange-50 to-blue-50">
+      <section id="pricing" className="relative py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-orange-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
@@ -1565,6 +1571,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </main>
   );
 }
