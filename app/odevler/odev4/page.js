@@ -71,7 +71,7 @@ export default function Odev4() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-indigo-50 font-inter">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">

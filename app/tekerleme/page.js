@@ -22,7 +22,7 @@ export default function TekerlemeOkuma({ items = DEFAULT_TEKERLEMELER }) {
   const goNext = () => setIndex((i) => Math.min(items.length - 1, i + 1));
 
   return (
-    <div className="min-h-[520px] bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-6">
+    <div className="min-h-[520px] bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-6 font-inter">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-2xl shadow-md p-6 md:p-8 border border-orange-100">
           <div className="flex items-center justify-between mb-4">

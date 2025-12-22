@@ -133,7 +133,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-900 via-yellow-900 to-orange-900 flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
+    <main className="min-h-screen bg-gradient-to-br from-amber-900 via-yellow-900 to-orange-900 flex items-center justify-center p-4 md:p-6 relative overflow-hidden font-inter">
       {/* Animated Gradient Background Blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div

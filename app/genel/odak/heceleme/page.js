@@ -310,7 +310,7 @@ export default function HecelemePage() {
   }, [showHeceler, heceIndex, currentKelime.heceler.length]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex flex-col items-center justify-center p-4 font-inter">
       <div className="text-center text-white mb-8">
         <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
           Heceleme Alıştırması

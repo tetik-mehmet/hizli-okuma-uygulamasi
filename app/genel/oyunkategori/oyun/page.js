@@ -217,7 +217,7 @@ const MemoryGame = ({ embedded = false } = {}) => {
     <div
       className={`${
         embedded ? "w-full min-h-[650px]" : "w-screen h-screen overflow-hidden"
-      } bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 p-4 font-sans flex flex-col`}
+      } bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 p-4 font-inter flex flex-col`}
     >
       <div className="flex-1 flex flex-col">
         {/* Başlık Bölümü */}

@@ -650,7 +650,7 @@ export default function HızlıOkumaEgzersizi() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden font-inter">
 
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden">

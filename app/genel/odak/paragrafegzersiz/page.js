@@ -1628,7 +1628,7 @@ export default function ParagrafEgzersizi({
     <div
       className={`${
         embedded ? "min-h-[600px]" : "min-h-screen"
-      } bg-gradient-to-br from-blue-50 to-indigo-100 py-8`}
+      } bg-gradient-to-br from-blue-50 to-indigo-100 py-8 font-inter`}
     >
       <div className="max-w-4xl mx-auto px-4">
 

@@ -370,7 +370,7 @@ export default function Exercise4({ initialSet = 1 }) {
   };
 
   return (
-    <div className={`${initialSet ? 'min-h-0' : 'min-h-screen'} bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50`}>
+    <div className={`${initialSet ? 'min-h-0' : 'min-h-screen'} bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 font-inter`}>
       <div className={`container mx-auto px-4 ${initialSet ? 'py-4' : 'py-8'}`}>
         {/* Başlık - Sadece standalone modda göster */}
         {!initialSet && (

@@ -122,7 +122,7 @@ export default function FreeTrialPage() {
       title: "Logo Hafıza Egzersizi",
       description: "Logoları görüp hatırlama becerinizi test edin",
       icon: Brain,
-      link: "/exercise4",
+      link: "/genel/bolum1/hafiza/exercise4",
       color: "from-blue-500 to-indigo-600",
     },
     {
@@ -133,6 +133,15 @@ export default function FreeTrialPage() {
       icon: Zap,
       link: "/genel/bolum1/exercises",
       color: "from-yellow-500 to-orange-600",
+    },
+    {
+      id: "exercise2",
+      title: "Görsel Takip Egzersizi",
+      description:
+        "Hareketli balığı takip ederek göz takibi ve odaklanma becerinizi geliştirin",
+      icon: Eye,
+      link: "/genel/bolum1/exercise2",
+      color: "from-teal-500 to-cyan-600",
     },
     {
       id: "kaybolan-metin",
@@ -154,7 +163,7 @@ export default function FreeTrialPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 px-4 sm:px-6 lg:px-8 font-inter">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -166,8 +175,8 @@ export default function FreeTrialPage() {
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
             Platformumuzu 7 gün boyunca ücretsiz deneyin. Logo Hafıza, Hızlı
-            Okuma, Kaybolan Metin ve Sağ-Sol Beyin egzersizlerine erişim
-            sağlayın!
+            Okuma, Görsel Takip, Kaybolan Metin ve Sağ-Sol Beyin egzersizlerine
+            erişim sağlayın!
           </p>
         </div>
 
@@ -306,7 +315,7 @@ export default function FreeTrialPage() {
           <div className="mt-12 bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
             <p className="text-blue-800">
               <strong>Not:</strong> Ücretsiz deneme süresi boyunca sadece Logo
-              Hafıza, Hızlı Okuma, Kaybolan Metin ve Sağ-Sol Beyin
+              Hafıza, Hızlı Okuma, Görsel Takip, Kaybolan Metin ve Sağ-Sol Beyin
               egzersizlerine erişebilirsiniz. Tüm içeriklere erişmek için
               abonelik satın almanız gerekmektedir.
             </p>

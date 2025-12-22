@@ -1059,7 +1059,7 @@ export default function Exercise3() {
   }, [yazimFinished, yazimStarted, yazimAnswers]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "40px" }} className="font-inter">
 
       {/* Mevcut hızlı okuma alıştırması - KALDIRILDI */}
 

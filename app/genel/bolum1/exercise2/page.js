@@ -493,7 +493,7 @@ export default function Exercise2() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 p-8 font-inter">
       <div className="max-w-4xl mx-auto">
         {/* Egzersiz Talimatları - Info Hover */}
         <div className="flex justify-start mb-6 relative group">

@@ -195,7 +195,7 @@ const RenkKaybolma = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 font-inter">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

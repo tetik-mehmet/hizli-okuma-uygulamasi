@@ -411,7 +411,7 @@ export default function CabucakCumleEgzersizi() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 font-inter">
       {/* Seçim ekranı */}
       {!basladi && !bitis && (
         <div className="w-full max-w-2xl mx-auto bg-white/70 backdrop-blur-md rounded-3xl shadow-xl border border-white p-8">

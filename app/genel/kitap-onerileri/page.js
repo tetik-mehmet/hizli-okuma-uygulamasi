@@ -227,7 +227,7 @@ const KitapOnerileri = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-inter">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

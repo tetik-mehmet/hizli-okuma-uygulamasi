@@ -556,7 +556,7 @@ export default function HafizaEt() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 py-8 px-4 font-inter">
       <div className="max-w-6xl mx-auto">
         {/* Başlık Bölümü - Daha yumuşak */}
         <div className="text-center mb-8">

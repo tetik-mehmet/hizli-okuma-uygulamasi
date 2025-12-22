@@ -392,7 +392,7 @@ export default function DilbilgisiPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 font-inter">
       <div className="max-w-4xl mx-auto px-4">
 
         <motion.div

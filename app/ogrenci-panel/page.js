@@ -144,7 +144,7 @@ export default function OgrenciPaneliPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-100 p-4">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-100 p-4 font-inter">
       <div className="max-w-7xl mx-auto">
         {/* Başlık Bölümü */}
         <div className="mb-6">

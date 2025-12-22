@@ -110,7 +110,7 @@ export default function Panel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 font-inter">
       <div className="max-w-6xl mx-auto">
         {/* Header - Başlık ve Geri Butonu */}
         <div className="flex justify-between items-center mb-8">

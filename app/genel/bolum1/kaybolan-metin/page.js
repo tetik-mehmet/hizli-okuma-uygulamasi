@@ -99,7 +99,7 @@ export default function KaybolanMetin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8 font-inter">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-indigo-800 mb-8">
           Kaybolan Metin Egzersizi

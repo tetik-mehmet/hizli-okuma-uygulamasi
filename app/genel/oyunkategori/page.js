@@ -162,7 +162,7 @@ export default function OyunKategoriPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden font-inter">
       {/* 3D Background Elements */}
       <div className="absolute inset-0">
         {/* Animated Grid */}

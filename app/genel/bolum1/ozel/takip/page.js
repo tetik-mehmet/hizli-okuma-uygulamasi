@@ -241,7 +241,7 @@ export default function TakipPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 font-inter">
 
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">

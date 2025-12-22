@@ -33,7 +33,7 @@ export default function SiirSayfasi() {
   const [cevap, setCevap] = useState("");
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-sky-50 to-white text-gray-900">
+    <div className="min-h-screen w-full bg-gradient-to-b from-sky-50 to-white text-gray-900 font-inter">
       <div className="max-w-3xl mx-auto px-4 py-10">
         <h1 className="text-3xl font-extrabold tracking-tight mb-6">Şiir</h1>
 

@@ -233,7 +233,7 @@ export default function SagsolPage() {
 
   if (!selectedExercise) {
     return (
-      <div className="max-w-6xl mx-auto p-5 font-sans">
+      <div className="max-w-6xl mx-auto p-5 font-inter">
         <h1 className="text-center text-slate-800 mb-8 text-4xl font-bold">
           Sağ-Sol Beyin Egzersizi
         </h1>

@@ -691,7 +691,7 @@ export default function YazimPage({ visibleSets = null }) {
 
   if (showResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-inter p-4">
         <div className="max-w-4xl mx-auto">
           <audio
             ref={timeUpAudioRef}
@@ -825,7 +825,7 @@ export default function YazimPage({ visibleSets = null }) {
 
   if (!isActive) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-inter flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl w-full text-center">
           <audio
             ref={timeUpAudioRef}
