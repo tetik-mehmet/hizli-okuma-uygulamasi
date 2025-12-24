@@ -1203,7 +1203,7 @@ export default function Home() {
                 </h3>
                 <div className="mb-4">
                   <span className="text-4xl sm:text-5xl font-bold text-orange-600 font-inter">
-                    1299₺
+                    1899₺
                   </span>
                   <span className="text-gray-600 text-lg ml-2 font-inter">
                     /ay
@@ -1261,7 +1261,7 @@ export default function Home() {
                 </h3>
                 <div className="mb-4">
                   <span className="text-4xl sm:text-5xl font-bold text-orange-600 font-inter">
-                    3699₺
+                    5299₺
                   </span>
                   <span className="text-gray-600 text-lg ml-2 font-inter">
                     /3 ay
@@ -1348,7 +1348,7 @@ export default function Home() {
                 </h3>
                 <div className="mb-4">
                   <span className="text-4xl sm:text-5xl font-bold text-orange-600 font-inter">
-                    13999₺
+                    19999₺
                   </span>
                   <span className="text-gray-600 text-lg ml-2 font-inter">
                     /yıl
@@ -1359,7 +1359,7 @@ export default function Home() {
                 </p>
                 <div className="mt-2 inline-block bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
                   <span className="text-orange-700 text-xs font-semibold font-inter">
-                    Aylık 1166₺&apos;ye denk gelir
+                    Aylık 1667₺&apos;ye denk gelir
                   </span>
                 </div>
               </div>

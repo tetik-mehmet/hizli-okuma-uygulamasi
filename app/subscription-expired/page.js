@@ -111,9 +111,9 @@ export default function SubscriptionExpiredPage() {
     };
 
     setTimeout(() => {
-      animatePrice(1299, "monthly");
-      animatePrice(3699, "quarterly");
-      animatePrice(13999, "yearly");
+      animatePrice(1899, "monthly");
+      animatePrice(5299, "quarterly");
+      animatePrice(19999, "yearly");
     }, 800);
   }, [router]);
 
@@ -1264,7 +1264,7 @@ export default function SubscriptionExpiredPage() {
                       whileHover={{ scale: 1.03 }}
                     >
                       <span className="text-indigo-700 text-xs font-semibold">
-                        Aylık 1166₺&apos;ye denk gelir
+                        Aylık 1667₺&apos;ye denk gelir
                       </span>
                     </motion.div>
                   </div>

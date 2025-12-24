@@ -73,6 +73,12 @@ export default function Header() {
   const navItems = [
     { label: "Özellikler", href: "#features", id: "features" },
     { label: "Fiyatlandırma", href: "#pricing", id: "pricing" },
+    { label: "Hakkımızda", href: "/hakkimizda", id: "hakkimizda" },
+    {
+      label: "SpeedMind Nedir?",
+      href: "/speedmind",
+      id: "speedmind",
+    },
     { label: "İletişim", href: "/iletisim", id: "contact" },
   ];
 
