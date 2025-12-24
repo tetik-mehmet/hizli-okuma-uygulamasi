@@ -22,6 +22,8 @@ import {
   TrendingUp,
   Target,
   PlayCircle,
+  Phone,
+  Mail,
 } from "lucide-react";
 
 export default function SubscriptionExpiredPage() {
@@ -118,58 +120,8 @@ export default function SubscriptionExpiredPage() {
   }, [router]);
 
   const handlePurchase = async (subscriptionType) => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      const response = await fetch("/api/subscription/purchase", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ subscriptionType }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Abonelik bilgilerini localStorage'a kaydet
-        localStorage.setItem("isSubscribed", "true");
-        localStorage.setItem(
-          "subscriptionType",
-          data.subscription.subscriptionType
-        );
-        localStorage.setItem(
-          "subscriptionStartDate",
-          data.subscription.subscriptionStartDate
-        );
-        localStorage.setItem(
-          "subscriptionEndDate",
-          data.subscription.subscriptionEndDate
-        );
-        localStorage.setItem(
-          "subscriptionStatus",
-          data.subscription.subscriptionStatus
-        );
-
-        // Genel sayfasına yönlendir
-        router.push("/genel");
-      } else {
-        setError(data.message || "Abonelik satın alma işlemi başarısız oldu.");
-      }
-    } catch (error) {
-      console.error("Purchase error:", error);
-      setError("Bağlantı hatası. Lütfen tekrar deneyin.");
-    } finally {
-      setLoading(false);
-    }
+    // İletişim sayfasına yönlendir
+    router.push("/iletisim");
   };
 
   const handleStartFreeTrial = async () => {
@@ -983,161 +935,333 @@ export default function SubscriptionExpiredPage() {
 
           {/* 🧾 Abonelik Bilgisi - Pricing Cards (Secondary) */}
           {subscriptionStatus !== "active" && (
-            <motion.div
-              variants={itemVariants}
-              className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto pt-4"
-            >
-              {/* Monthly Package */}
+            <>
               <motion.div
-                variants={cardVariants}
-                whileHover={{ y: -4, scale: 1.01 }}
-                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-blue-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                variants={itemVariants}
+                className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto pt-4"
               >
-                <div className="relative z-10">
-                  <div className="text-center mb-5">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      Aylık Paket
-                    </h3>
-                    <div className="mb-3">
-                      <motion.span
-                        className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.9 }}
-                      >
-                        {priceCounters.monthly}₺
-                      </motion.span>
-                      <span className="text-gray-600 text-base ml-2">/ay</span>
-                    </div>
-                    <p className="text-gray-600 text-xs">
-                      Aylık abonelik ile tüm içeriklere erişim
-                    </p>
-                  </div>
-
-                  <ul className="space-y-2 mb-6">
-                    {[
-                      "📚 Okuma hızını bilimsel egzersizlerle 3 kata kadar çıkar",
-                      "🎯 Dikkatini güçlendirerek odak süreni 2–3 kat uzat",
-                      "📈 Okuduğunu anlama oranını %30'a kadar artır",
-                      "⏰ 7/24 erişimle istediğin zaman, istediğin yerden pratik yap",
-                      "✅ İlerlemeni grafiklerle takip ederek motivasyonunu yüksek tut",
-                    ].map((feature, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-start gap-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 1 + index * 0.1 }}
-                      >
-                        <motion.div
-                          whileHover={{ scale: 1.2, rotate: 5 }}
-                          className="flex-shrink-0"
+                {/* Monthly Package */}
+                <motion.div
+                  variants={cardVariants}
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-blue-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                >
+                  <div className="relative z-10">
+                    <div className="text-center mb-5">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">
+                        Aylık Paket
+                      </h3>
+                      <div className="mb-3">
+                        <motion.span
+                          className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.9 }}
                         >
-                          <Check className="w-5 h-5 text-blue-500 mt-0.5" />
-                        </motion.div>
-                        <span className="text-gray-700 text-sm">{feature}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-
-                  <motion.button
-                    onClick={() => handlePurchase("monthly")}
-                    disabled={loading}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-blue-500/20 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
-                  >
-                    {/* Shine Effect */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      animate={{
-                        x: ["-100%", "200%"],
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        repeatDelay: 2,
-                      }}
-                    />
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loading ? (
-                        <>
-                          <svg
-                            className="animate-spin h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v8z"
-                            />
-                          </svg>
-                          İşleniyor...
-                        </>
-                      ) : (
-                        <>
-                          <Crown className="w-4 h-4" />
-                          Abone Ol
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </span>
-                  </motion.button>
-                </div>
-              </motion.div>
-
-              {/* Quarterly Package */}
-              <motion.div
-                variants={cardVariants}
-                whileHover={{ y: -4, scale: 1.01 }}
-                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-indigo-200 hover:border-indigo-300 hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="relative z-10">
-                  <div className="text-center mb-5">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      3 Aylık Paket
-                    </h3>
-                    <div className="mb-3">
-                      <motion.span
-                        className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1 }}
-                      >
-                        {priceCounters.quarterly}₺
-                      </motion.span>
-                      <span className="text-gray-600 text-base ml-2">
-                        /3 ay
-                      </span>
+                          {priceCounters.monthly}₺
+                        </motion.span>
+                        <span className="text-gray-600 text-base ml-2">
+                          /ay
+                        </span>
+                      </div>
+                      <p className="text-gray-600 text-xs">
+                        Aylık abonelik ile tüm içeriklere erişim
+                      </p>
                     </div>
-                    <p className="text-gray-600 text-xs">
-                      3 aylık abonelik ile tüm içeriklere erişim
-                    </p>
-                  </div>
 
-                  <ul className="space-y-2 mb-6">
-                    {[
-                      "📚 3 ay boyunca okuma hızını 3 kata kadar çıkarma fırsatı",
-                      "🎯 Düzenli egzersizlerle sınav ve ders çalışırken odaklanma gücünü artır",
-                      "📈 Okuduğunu anlama oranını %30'a kadar yükselt",
-                      "⏰ 3 ay kesintisiz erişimle her gün kısa pratiklerle zaman kazan",
-                      "✅ İlerleme raporlarınla gelişimini net bir şekilde gör",
-                    ].map((feature, index) => (
+                    <ul className="space-y-2 mb-6">
+                      {[
+                        "📚 Okuma hızını bilimsel egzersizlerle 3 kata kadar çıkar",
+                        "🎯 Dikkatini güçlendirerek odak süreni 2–3 kat uzat",
+                        "📈 Okuduğunu anlama oranını %30'a kadar artır",
+                        "⏰ 7/24 erişimle istediğin zaman, istediğin yerden pratik yap",
+                        "✅ İlerlemeni grafiklerle takip ederek motivasyonunu yüksek tut",
+                      ].map((feature, index) => (
+                        <motion.li
+                          key={index}
+                          className="flex items-start gap-3"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1 + index * 0.1 }}
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            className="flex-shrink-0"
+                          >
+                            <Check className="w-5 h-5 text-blue-500 mt-0.5" />
+                          </motion.div>
+                          <span className="text-gray-700 text-sm">
+                            {feature}
+                          </span>
+                        </motion.li>
+                      ))}
+                    </ul>
+
+                    <motion.button
+                      onClick={() => handlePurchase("monthly")}
+                      disabled={loading}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-blue-500/20 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
+                    >
+                      {/* Shine Effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                        }}
+                      />
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <svg
+                              className="animate-spin h-5 w-5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8z"
+                              />
+                            </svg>
+                            İşleniyor...
+                          </>
+                        ) : (
+                          <>
+                            <Crown className="w-4 h-4" />
+                            Abone Ol
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                  </div>
+                </motion.div>
+
+                {/* Quarterly Package */}
+                <motion.div
+                  variants={cardVariants}
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-indigo-200 hover:border-indigo-300 hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                >
+                  <div className="relative z-10">
+                    <div className="text-center mb-5">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">
+                        3 Aylık Paket
+                      </h3>
+                      <div className="mb-3">
+                        <motion.span
+                          className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 1 }}
+                        >
+                          {priceCounters.quarterly}₺
+                        </motion.span>
+                        <span className="text-gray-600 text-base ml-2">
+                          /3 ay
+                        </span>
+                      </div>
+                      <p className="text-gray-600 text-xs">
+                        3 aylık abonelik ile tüm içeriklere erişim
+                      </p>
+                    </div>
+
+                    <ul className="space-y-2 mb-6">
+                      {[
+                        "📚 3 ay boyunca okuma hızını 3 kata kadar çıkarma fırsatı",
+                        "🎯 Düzenli egzersizlerle sınav ve ders çalışırken odaklanma gücünü artır",
+                        "📈 Okuduğunu anlama oranını %30'a kadar yükselt",
+                        "⏰ 3 ay kesintisiz erişimle her gün kısa pratiklerle zaman kazan",
+                        "✅ İlerleme raporlarınla gelişimini net bir şekilde gör",
+                      ].map((feature, index) => (
+                        <motion.li
+                          key={index}
+                          className="flex items-start gap-3"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.1 + index * 0.1 }}
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            className="flex-shrink-0"
+                          >
+                            <Check className="w-5 h-5 text-indigo-500 mt-0.5" />
+                          </motion.div>
+                          <span className="text-gray-700 text-sm">
+                            {feature}
+                          </span>
+                        </motion.li>
+                      ))}
+                    </ul>
+
+                    <motion.button
+                      onClick={() => handlePurchase("quarterly")}
+                      disabled={loading}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
+                    >
+                      {/* Shine Effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                        }}
+                      />
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <svg
+                              className="animate-spin h-5 w-5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8z"
+                              />
+                            </svg>
+                            İşleniyor...
+                          </>
+                        ) : (
+                          <>
+                            <Crown className="w-4 h-4" />
+                            Abone Ol
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                  </div>
+                </motion.div>
+
+                {/* Yearly Package - Featured */}
+                <motion.div
+                  variants={cardVariants}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  className="bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl border-2 border-indigo-300 hover:border-purple-400 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group"
+                >
+                  {/* Popular Badge */}
+                  <motion.div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
+                    animate={{
+                      y: [0, -3, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5">
+                      <motion.div
+                        animate={{
+                          rotate: [0, 15, -15, 0],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <Crown className="w-3 h-3" />
+                      </motion.div>
+                      Popüler
+                    </span>
+                  </motion.div>
+
+                  <div className="relative z-10">
+                    <div className="text-center mb-5">
+                      <h3 className="text-xl font-bold text-indigo-900 mb-3">
+                        Yıllık Paket
+                      </h3>
+                      <div className="mb-3">
+                        <motion.span
+                          className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 1.1 }}
+                        >
+                          {priceCounters.yearly}₺
+                        </motion.span>
+                        <span className="text-gray-600 text-base ml-2">
+                          /yıl
+                        </span>
+                      </div>
+                      <p className="text-gray-600 text-xs mb-2">
+                        Yıllık abonelik ile %15 tasarruf edin
+                      </p>
+                      <motion.div
+                        className="inline-block bg-gradient-to-r from-indigo-100 to-purple-100 px-3 py-1 rounded-full border border-indigo-200"
+                        whileHover={{ scale: 1.03 }}
+                      >
+                        <span className="text-indigo-700 text-xs font-semibold">
+                          Aylık 1667₺&apos;ye denk gelir
+                        </span>
+                      </motion.div>
+                    </div>
+
+                    <ul className="space-y-2 mb-6">
+                      {[
+                        "📚 12 ay boyunca okuma hızını 3–5 kata kadar çıkarma imkânı",
+                        "🎯 Uzun vadeli programla odaklanma ve dikkat süreni kalıcı olarak artır",
+                        "📈 Okuduğunu anlama oranını yıl boyunca düzenli egzersizlerle %30'a kadar yükselt",
+                        "⏰ Yıl boyu sınırsız erişimle her gün sadece 15–20 dakikada zaman kazan",
+                        "✅ Detaylı ilerleme raporlarıyla gelişimini adım adım takip et",
+                        "🤝 Öncelikli destekle sorularına daha hızlı yanıt al",
+                      ].map((feature, index) => (
+                        <motion.li
+                          key={index}
+                          className="flex items-start gap-3"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.2 + index * 0.1 }}
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            className="flex-shrink-0"
+                          >
+                            <Check className="w-5 h-5 text-indigo-500 mt-0.5" />
+                          </motion.div>
+                          <span className="text-gray-800 text-sm font-medium">
+                            {feature}
+                          </span>
+                        </motion.li>
+                      ))}
                       <motion.li
-                        key={index}
                         className="flex items-start gap-3"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 1.1 + index * 0.1 }}
+                        transition={{ delay: 1.8 }}
                       >
                         <motion.div
                           whileHover={{ scale: 1.2, rotate: 5 }}
@@ -1145,247 +1269,215 @@ export default function SubscriptionExpiredPage() {
                         >
                           <Check className="w-5 h-5 text-indigo-500 mt-0.5" />
                         </motion.div>
-                        <span className="text-gray-700 text-sm">{feature}</span>
+                        <a
+                          href="https://hipnodilakademi.net/danismanlik"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-indigo-700 text-sm underline underline-offset-2 decoration-indigo-300 hover:text-indigo-800 transition-colors"
+                        >
+                          Hipnodil Akademi öğrenci danışmanlık merkezinden %10
+                          indirim fırsatı
+                        </a>
                       </motion.li>
-                    ))}
-                  </ul>
+                    </ul>
 
-                  <motion.button
-                    onClick={() => handlePurchase("quarterly")}
-                    disabled={loading}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
-                  >
-                    {/* Shine Effect */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      animate={{
-                        x: ["-100%", "200%"],
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        repeatDelay: 2,
-                      }}
-                    />
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loading ? (
-                        <>
-                          <svg
-                            className="animate-spin h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v8z"
-                            />
-                          </svg>
-                          İşleniyor...
-                        </>
-                      ) : (
-                        <>
-                          <Crown className="w-4 h-4" />
-                          Abone Ol
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </span>
-                  </motion.button>
-                </div>
+                    <motion.button
+                      onClick={() => handlePurchase("yearly")}
+                      disabled={loading}
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-purple-500/20 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
+                    >
+                      {/* Enhanced Shine Effect for Premium */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 1.5,
+                        }}
+                      />
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <svg
+                              className="animate-spin h-5 w-5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8z"
+                              />
+                            </svg>
+                            İşleniyor...
+                          </>
+                        ) : (
+                          <>
+                            <motion.div
+                              animate={{
+                                rotate: [0, 15, -15, 0],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                            >
+                              <Crown className="w-4 h-4" />
+                            </motion.div>
+                            Abone Ol
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                  </div>
+                </motion.div>
               </motion.div>
 
-              {/* Yearly Package - Featured */}
+              {/* Abonelik için İletişime Geçin Bölümü */}
               <motion.div
-                variants={cardVariants}
-                whileHover={{ y: -4, scale: 1.02 }}
-                className="bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl border-2 border-indigo-300 hover:border-purple-400 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group"
+                variants={itemVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 0.6 }}
+                className="max-w-4xl mx-auto pt-8"
               >
-                {/* Popular Badge */}
                 <motion.div
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 z-20"
-                  animate={{
-                    y: [0, -3, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  whileHover={{ scale: 1.01, y: -2 }}
+                  className="bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 rounded-3xl p-8 shadow-xl border-2 border-indigo-200/50 relative overflow-hidden"
                 >
-                  <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5">
+                  {/* Arka plan dekoratif elementler */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <motion.div
+                      className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl"
                       animate={{
-                        rotate: [0, 15, -15, 0],
+                        scale: [1, 1.2, 1],
+                        opacity: [0.3, 0.5, 0.3],
                       }}
                       transition={{
-                        duration: 2,
+                        duration: 4,
                         repeat: Infinity,
                         ease: "easeInOut",
                       }}
-                    >
-                      <Crown className="w-3 h-3" />
-                    </motion.div>
-                    Popüler
-                  </span>
-                </motion.div>
-
-                <div className="relative z-10">
-                  <div className="text-center mb-5">
-                    <h3 className="text-xl font-bold text-indigo-900 mb-3">
-                      Yıllık Paket
-                    </h3>
-                    <div className="mb-3">
-                      <motion.span
-                        className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1.1 }}
-                      >
-                        {priceCounters.yearly}₺
-                      </motion.span>
-                      <span className="text-gray-600 text-base ml-2">/yıl</span>
-                    </div>
-                    <p className="text-gray-600 text-xs mb-2">
-                      Yıllık abonelik ile %15 tasarruf edin
-                    </p>
-                    <motion.div
-                      className="inline-block bg-gradient-to-r from-indigo-100 to-purple-100 px-3 py-1 rounded-full border border-indigo-200"
-                      whileHover={{ scale: 1.03 }}
-                    >
-                      <span className="text-indigo-700 text-xs font-semibold">
-                        Aylık 1667₺&apos;ye denk gelir
-                      </span>
-                    </motion.div>
+                    />
                   </div>
 
-                  <ul className="space-y-2 mb-6">
-                    {[
-                      "📚 12 ay boyunca okuma hızını 3–5 kata kadar çıkarma imkânı",
-                      "🎯 Uzun vadeli programla odaklanma ve dikkat süreni kalıcı olarak artır",
-                      "📈 Okuduğunu anlama oranını yıl boyunca düzenli egzersizlerle %30'a kadar yükselt",
-                      "⏰ Yıl boyu sınırsız erişimle her gün sadece 15–20 dakikada zaman kazan",
-                      "✅ Detaylı ilerleme raporlarıyla gelişimini adım adım takip et",
-                      "🤝 Öncelikli destekle sorularına daha hızlı yanıt al",
-                    ].map((feature, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-start gap-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 1.2 + index * 0.1 }}
-                      >
-                        <motion.div
-                          whileHover={{ scale: 1.2, rotate: 5 }}
-                          className="flex-shrink-0"
-                        >
-                          <Check className="w-5 h-5 text-indigo-500 mt-0.5" />
-                        </motion.div>
-                        <span className="text-gray-800 text-sm font-medium">
-                          {feature}
-                        </span>
-                      </motion.li>
-                    ))}
-                    <motion.li
-                      className="flex items-start gap-3"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 1.8 }}
-                    >
+                  <div className="relative z-10">
+                    <div className="text-center mb-6">
                       <motion.div
-                        whileHover={{ scale: 1.2, rotate: 5 }}
-                        className="flex-shrink-0"
+                        className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 mb-4 shadow-lg"
+                        animate={{
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 5, -5, 0],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
                       >
-                        <Check className="w-5 h-5 text-indigo-500 mt-0.5" />
+                        <Phone className="w-8 h-8 text-white" />
                       </motion.div>
-                      <a
-                        href="https://hipnodilakademi.net/danismanlik"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-700 text-sm underline underline-offset-2 decoration-indigo-300 hover:text-indigo-800 transition-colors"
+                      <motion.h2
+                        className="text-3xl md:text-4xl font-bold text-gray-900 mb-3"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.6 }}
                       >
-                        Hipnodil Akademi öğrenci danışmanlık merkezinden %10
-                        indirim fırsatı
-                      </a>
-                    </motion.li>
-                  </ul>
+                        <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                          Abonelik için İletişime Geçin
+                        </span>
+                      </motion.h2>
+                      <motion.p
+                        className="text-lg text-gray-700 max-w-2xl mx-auto"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.7 }}
+                      >
+                        Abonelik işlemleri için lütfen bizimle iletişime geçin.
+                        Size en uygun paketi seçmenizde yardımcı olmaktan
+                        mutluluk duyarız.
+                      </motion.p>
+                    </div>
 
-                  <motion.button
-                    onClick={() => handlePurchase("yearly")}
-                    disabled={loading}
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-purple-500/20 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
-                  >
-                    {/* Enhanced Shine Effect for Premium */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                      animate={{
-                        x: ["-100%", "200%"],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatDelay: 1.5,
-                      }}
-                    />
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loading ? (
-                        <>
-                          <svg
-                            className="animate-spin h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v8z"
-                            />
-                          </svg>
-                          İşleniyor...
-                        </>
-                      ) : (
-                        <>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                      <Link href="/iletisim" className="w-full sm:w-auto">
+                        <motion.button
+                          whileHover={{ scale: 1.05, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-opacity-50 relative overflow-hidden group"
+                        >
+                          {/* Shine Effect */}
                           <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                             animate={{
-                              rotate: [0, 15, -15, 0],
+                              x: ["-100%", "200%"],
                             }}
                             transition={{
                               duration: 2,
                               repeat: Infinity,
-                              ease: "easeInOut",
+                              repeatDelay: 1,
                             }}
-                          >
-                            <Crown className="w-4 h-4" />
-                          </motion.div>
-                          Abone Ol
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </span>
-                  </motion.button>
-                </div>
+                          />
+                          <span className="relative z-10 flex items-center justify-center gap-3">
+                            <Mail className="w-5 h-5" />
+                            İletişim Sayfasına Git
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                          </span>
+                        </motion.button>
+                      </Link>
+                    </div>
+
+                    {/* İletişim Bilgileri */}
+                    <motion.div
+                      className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.8 }}
+                    >
+                      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-indigo-100">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Phone className="w-5 h-5 text-indigo-600" />
+                          <p className="font-semibold text-gray-800">Telefon</p>
+                        </div>
+                        <a
+                          href="tel:+905304784166"
+                          className="text-indigo-700 hover:text-indigo-800 transition-colors text-sm"
+                        >
+                          +90 (530) 478 41 66
+                        </a>
+                      </div>
+                      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-indigo-100">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Mail className="w-5 h-5 text-indigo-600" />
+                          <p className="font-semibold text-gray-800">E-posta</p>
+                        </div>
+                        <a
+                          href="mailto:info@hizliokuma.app"
+                          className="text-indigo-700 hover:text-indigo-800 transition-colors text-sm"
+                        >
+                          info@hizliokuma.app
+                        </a>
+                      </div>
+                    </motion.div>
+                  </div>
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </>
           )}
 
           {/* Error Message */}

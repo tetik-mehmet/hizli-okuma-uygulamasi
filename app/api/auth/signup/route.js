@@ -7,16 +7,17 @@ export async function POST(request) {
   try {
     await connectDB();
 
-    let { name, surname, email, password } = await request.json();
+    let { name, surname, email, phone, password } = await request.json();
 
     // Email'i normalize et (lowercase ve trim)
     email = email.trim().toLowerCase();
     name = name.trim();
     surname = surname.trim();
+    phone = phone ? phone.trim() : "";
     password = password.trim();
 
     console.log("=== SIGNUP DEBUG ===");
-    console.log("Signup isteği alındı:", { email, name, surname });
+    console.log("Signup isteği alındı:", { email, name, surname, phone });
 
     // Email kontrolü
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -36,12 +37,13 @@ export async function POST(request) {
       name,
       surname,
       email,
+      phone: phone || undefined,
       password: hashedPassword,
     });
 
     await newUser.save();
 
-    console.log("✅ Yeni kullanıcı kaydedildi:", { email, name, surname });
+    console.log("✅ Yeni kullanıcı kaydedildi:", { email, name, surname, phone });
     console.log("=== SIGNUP DEBUG END ===");
 
     return NextResponse.json({ message: "Kayıt başarılı!" }, { status: 201 });

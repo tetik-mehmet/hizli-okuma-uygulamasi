@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Star,
   Users,
+  Phone,
 } from "lucide-react";
 
 export default function SignupPage() {
@@ -26,6 +27,7 @@ export default function SignupPage() {
     name: "",
     surname: "",
     email: "",
+    phone: "",
     password: "",
   });
 
@@ -142,6 +144,19 @@ export default function SignupPage() {
       isValid = false;
     }
 
+    // Telefon numarası validasyonu (opsiyonel ama girilmişse format kontrolü)
+    if (form.phone.trim()) {
+      const phoneRegex = /^[\d\s\+\-\(\)]+$/;
+      const cleanPhone = form.phone.replace(/\s/g, "");
+      if (!phoneRegex.test(form.phone)) {
+        errors.phone = "Geçerli bir telefon numarası girin.";
+        isValid = false;
+      } else if (cleanPhone.length < 10) {
+        errors.phone = "Telefon numarası en az 10 karakter olmalıdır.";
+        isValid = false;
+      }
+    }
+
     if (!form.password) {
       errors.password = "Şifre alanı zorunludur.";
       isValid = false;
@@ -176,6 +191,7 @@ export default function SignupPage() {
           name: form.name,
           surname: form.surname,
           email: form.email,
+          phone: form.phone,
           password: form.password,
         }),
       });
@@ -185,7 +201,7 @@ export default function SignupPage() {
       if (response.ok) {
         // Başarılı kayıt
         setSuccess(true);
-        setForm({ name: "", surname: "", email: "", password: "" });
+        setForm({ name: "", surname: "", email: "", phone: "", password: "" });
 
         // 2 saniye sonra login sayfasına yönlendir
         setTimeout(() => {
@@ -511,6 +527,40 @@ export default function SignupPage() {
                   >
                     <AlertCircle className="w-3 h-3" />
                     {fieldErrors.email}
+                  </motion.p>
+                )}
+              </div>
+
+              {/* Telefon Numarası Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-blue-600" />
+                  Telefon Numarası
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="+90 555 123 4567 veya 0555 123 4567"
+                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base ${
+                      fieldErrors.phone
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-pink-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    }`}
+                    value={form.phone}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                  <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                </div>
+                {fieldErrors.phone && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-600 text-xs flex items-center gap-1"
+                  >
+                    <AlertCircle className="w-3 h-3" />
+                    {fieldErrors.phone}
                   </motion.p>
                 )}
               </div>
