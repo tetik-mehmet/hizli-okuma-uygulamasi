@@ -1,0 +1,27 @@
+{
+  "name": "Hızlı Okuma - Okuma Hızınızı 3 Kat Artırın",
+  "short_name": "Hızlı Okuma",
+  "description": "Hızlı okuma teknikleri ile okuma hızınızı 3 kat artırın. Bilimsel yöntemlerle anlama oranınızı koruyarak daha hızlı okuyun.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "tr"
+}
+

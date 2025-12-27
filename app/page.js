@@ -6,6 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import StructuredData, {
+  CourseSchema,
+  EducationalServiceSchema,
+} from "./components/StructuredData";
 import {
   BookOpen,
   Lightbulb,
@@ -367,6 +371,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-orange-50 text-gray-800 overflow-x-hidden font-inter">
+      {/* Structured Data for SEO */}
+      <StructuredData
+        data={CourseSchema({
+          name: "Hızlı Okuma Eğitimi",
+          description:
+            "Okuma hızınızı 3 kat artıran, anlama oranınızı koruyan bilimsel hızlı okuma teknikleri eğitimi. Öğrenciler, profesyoneller ve sınav hazırlığı yapanlar için özel programlar.",
+          price: "1899",
+          priceCurrency: "TRY",
+        })}
+      />
+      <StructuredData data={EducationalServiceSchema()} />
       {/* Header - Sadece Anasayfada */}
       <Header />
 

@@ -263,7 +263,7 @@ export default function Header() {
                   <div className="relative w-28 h-28 md:w-36 md:h-36">
                     <Image
                       src="/logo.png"
-                      alt="Hızlı Okuma Logo"
+                      alt="Hızlı Okuma - Okuma Hızınızı 3 Kat Artırın"
                       width={144}
                       height={144}
                       className="w-full h-full object-contain"
