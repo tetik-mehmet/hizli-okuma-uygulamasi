@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import Payment from "@/models/Payment";
+import { logActivity, getClientIp, getUserAgent } from "@/lib/activityLogger";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -62,15 +64,26 @@ export async function POST(request) {
     // Abonelik başlangıç ve bitiş tarihlerini hesapla
     const now = new Date();
     const subscriptionStartDate = now;
-    let subscriptionEndDate = new Date();
+    let subscriptionEndDate = new Date(now);
 
     if (subscriptionType === "monthly") {
-      subscriptionEndDate.setDate(subscriptionEndDate.getDate() + 30);
+      // 1 ay sonrası (gerçek ay hesabı)
+      subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
     } else if (subscriptionType === "quarterly") {
-      subscriptionEndDate.setDate(subscriptionEndDate.getDate() + 90);
+      // 3 ay sonrası
+      subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 3);
     } else if (subscriptionType === "yearly") {
-      subscriptionEndDate.setDate(subscriptionEndDate.getDate() + 365);
+      // 1 yıl sonrası
+      subscriptionEndDate.setFullYear(subscriptionEndDate.getFullYear() + 1);
     }
+
+    // Fiyat bilgisi
+    const prices = {
+      monthly: 1899,
+      quarterly: 5299,
+      yearly: 19999,
+    };
+    const amount = prices[subscriptionType] || 0;
 
     // Kullanıcının abonelik durumunu güncelle
     user.isSubscribed = true;
@@ -81,10 +94,42 @@ export async function POST(request) {
 
     await user.save();
 
+    // Ödeme kaydı oluştur
+    const payment = new Payment({
+      userId: user._id,
+      email: user.email,
+      subscriptionType,
+      amount,
+      currency: "TRY",
+      status: "completed",
+      paymentMethod: "manual",
+      subscriptionStartDate,
+      subscriptionEndDate,
+      notes: "Abonelik satın alma işlemi",
+    });
+
+    await payment.save();
+
+    // Aktivite log kaydet
+    await logActivity({
+      userId: user._id.toString(),
+      userEmail: user.email,
+      action: "subscription_purchase",
+      description: `${subscriptionType} abonelik satın alındı`,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
+      metadata: {
+        subscriptionType,
+        amount,
+        paymentId: payment._id.toString(),
+      },
+    });
+
     console.log("✅ Abonelik satın alındı:", {
       email: user.email,
       subscriptionType,
       subscriptionEndDate,
+      paymentId: payment._id,
     });
 
     return NextResponse.json({

@@ -63,38 +63,127 @@ export default function SubscriptionExpiredPage() {
       return;
     }
 
-    // Kullanıcı bilgilerini al
-    const name = localStorage.getItem("userName");
-    const surname = localStorage.getItem("userSurname");
-    if (name && surname) {
-      setUserName(`${name} ${surname}`);
-    } else if (name) {
-      setUserName(name);
-    }
+    // Güncel kullanıcı bilgilerini API'den çek
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("/api/user/me", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
 
-    const status = localStorage.getItem("subscriptionStatus");
-    const subscribed = localStorage.getItem("isSubscribed") === "true";
-    const endDate = localStorage.getItem("subscriptionEndDate");
-    const type = localStorage.getItem("subscriptionType");
+        if (response.ok) {
+          const data = await response.json();
+          const user = data.user;
 
-    setSubscriptionStatus(status || "none");
-    setIsSubscribed(subscribed);
-    setSubscriptionEndDate(endDate);
-    setSubscriptionType(type);
+          // localStorage'ı güncelle
+          if (user.name) {
+            localStorage.setItem("userName", user.name);
+          }
+          if (user.surname) {
+            localStorage.setItem("userSurname", user.surname);
+          }
+          localStorage.setItem(
+            "isSubscribed",
+            user.isSubscribed ? "true" : "false"
+          );
+          localStorage.setItem(
+            "subscriptionStatus",
+            user.subscriptionStatus || "none"
+          );
+          localStorage.setItem("subscriptionType", user.subscriptionType || "");
+          localStorage.setItem(
+            "subscriptionEndDate",
+            user.subscriptionEndDate || ""
+          );
+          localStorage.setItem(
+            "freeTrialStarted",
+            user.freeTrialStarted ? "true" : "false"
+          );
+          localStorage.setItem("freeTrialEndDate", user.freeTrialEndDate || "");
 
-    // Ücretsiz deneme durumunu kontrol et
-    const freeTrialStartedLocal =
-      localStorage.getItem("freeTrialStarted") === "true";
-    const freeTrialEndDateLocal = localStorage.getItem("freeTrialEndDate");
+          // State'leri güncelle
+          if (user.name && user.surname) {
+            setUserName(`${user.name} ${user.surname}`);
+          } else if (user.name) {
+            setUserName(user.name);
+          }
 
-    if (freeTrialStartedLocal && freeTrialEndDateLocal) {
-      const endDate = new Date(freeTrialEndDateLocal);
-      const now = new Date();
-      if (endDate > now) {
-        setFreeTrialStarted(true);
-        setFreeTrialEndDate(freeTrialEndDateLocal);
+          setSubscriptionStatus(user.subscriptionStatus || "none");
+          setIsSubscribed(user.isSubscribed || false);
+          setSubscriptionEndDate(user.subscriptionEndDate || null);
+          setSubscriptionType(user.subscriptionType || null);
+
+          // Ücretsiz deneme durumunu kontrol et
+          if (user.freeTrialStarted && user.freeTrialEndDate) {
+            const endDate = new Date(user.freeTrialEndDate);
+            const now = new Date();
+            if (endDate > now) {
+              setFreeTrialStarted(true);
+              setFreeTrialEndDate(user.freeTrialEndDate);
+            } else {
+              setFreeTrialStarted(false);
+              setFreeTrialEndDate(null);
+            }
+          } else {
+            setFreeTrialStarted(false);
+            setFreeTrialEndDate(null);
+          }
+        } else if (response.status === 401) {
+          // Token geçersiz, login sayfasına yönlendir
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("isLoggedIn");
+          router.push("/login");
+          return;
+        } else {
+          // API hatası, localStorage'dan oku (fallback)
+          console.error("API hatası, localStorage'dan okunuyor");
+          loadFromLocalStorage();
+        }
+      } catch (error) {
+        console.error("Kullanıcı bilgileri çekilirken hata:", error);
+        // Hata durumunda localStorage'dan oku (fallback)
+        loadFromLocalStorage();
       }
-    }
+    };
+
+    // localStorage'dan yükleme fonksiyonu (fallback)
+    const loadFromLocalStorage = () => {
+      const name = localStorage.getItem("userName");
+      const surname = localStorage.getItem("userSurname");
+      if (name && surname) {
+        setUserName(`${name} ${surname}`);
+      } else if (name) {
+        setUserName(name);
+      }
+
+      const status = localStorage.getItem("subscriptionStatus");
+      const subscribed = localStorage.getItem("isSubscribed") === "true";
+      const endDate = localStorage.getItem("subscriptionEndDate");
+      const type = localStorage.getItem("subscriptionType");
+
+      setSubscriptionStatus(status || "none");
+      setIsSubscribed(subscribed);
+      setSubscriptionEndDate(endDate);
+      setSubscriptionType(type);
+
+      // Ücretsiz deneme durumunu kontrol et
+      const freeTrialStartedLocal =
+        localStorage.getItem("freeTrialStarted") === "true";
+      const freeTrialEndDateLocal = localStorage.getItem("freeTrialEndDate");
+
+      if (freeTrialStartedLocal && freeTrialEndDateLocal) {
+        const endDate = new Date(freeTrialEndDateLocal);
+        const now = new Date();
+        if (endDate > now) {
+          setFreeTrialStarted(true);
+          setFreeTrialEndDate(freeTrialEndDateLocal);
+        }
+      }
+    };
+
+    // API'den güncel bilgileri çek
+    fetchUserData();
 
     // Price counting animation
     const animatePrice = (target, key, duration = 2000) => {
@@ -184,22 +273,38 @@ export default function SubscriptionExpiredPage() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userSurname");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userPackages");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("isSubscribed");
-    localStorage.removeItem("subscriptionType");
-    localStorage.removeItem("subscriptionStartDate");
-    localStorage.removeItem("subscriptionEndDate");
-    localStorage.removeItem("subscriptionStatus");
-    localStorage.removeItem("freeTrialStarted");
-    localStorage.removeItem("freeTrialEndDate");
-    router.replace("/login");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        // Backend'e logout bildir
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Logout log error:", error);
+    } finally {
+      // LocalStorage'ı temizle
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userSurname");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userPackages");
+      localStorage.removeItem("userData");
+      localStorage.removeItem("isSubscribed");
+      localStorage.removeItem("subscriptionType");
+      localStorage.removeItem("subscriptionStartDate");
+      localStorage.removeItem("subscriptionEndDate");
+      localStorage.removeItem("subscriptionStatus");
+      localStorage.removeItem("freeTrialStarted");
+      localStorage.removeItem("freeTrialEndDate");
+      router.replace("/login");
+    }
   };
 
   const containerVariants = {

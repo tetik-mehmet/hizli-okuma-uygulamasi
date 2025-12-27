@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import Payment from "@/models/Payment";
 import { checkAdminAccess } from "@/lib/adminAuth";
 
 /**
@@ -80,6 +81,69 @@ export async function GET(request) {
       createdAt: { $gte: sevenDaysAgo },
     });
 
+    // Son 30 günlük kullanıcı artış grafiği verisi
+    const userGrowthData = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      const count = await User.countDocuments({
+        createdAt: { $gte: date, $lt: nextDate },
+      });
+
+      userGrowthData.push({
+        date: date.toISOString().split("T")[0],
+        count,
+      });
+    }
+
+    // Abonelik dağılımı
+    const quarterlySubscriptions = await User.countDocuments({
+      subscriptionType: "quarterly",
+      subscriptionStatus: "active",
+    });
+
+    const subscriptionDistribution = {
+      monthly: monthlySubscriptions,
+      quarterly: quarterlySubscriptions,
+      yearly: yearlySubscriptions,
+    };
+
+    // Aylık gelir (son 12 ay)
+    const monthlyRevenue = [];
+    const prices = { monthly: 1899, quarterly: 5299, yearly: 19999 };
+
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      date.setDate(1);
+      date.setHours(0, 0, 0, 0);
+      const nextDate = new Date(date);
+      nextDate.setMonth(nextDate.getMonth() + 1);
+
+      const payments = await Payment.find({
+        createdAt: { $gte: date, $lt: nextDate },
+        status: "completed",
+      }).lean();
+
+      const revenue = payments.reduce((sum, payment) => sum + payment.amount, 0);
+
+      monthlyRevenue.push({
+        month: date.toISOString().split("T")[0],
+        revenue,
+        count: payments.length,
+      });
+    }
+
+    // Toplam gelir
+    const totalRevenue = await Payment.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
     return NextResponse.json({
       stats: {
         totalUsers,
@@ -89,9 +153,14 @@ export async function GET(request) {
         freeTrialUsers,
         activeFreeTrial,
         monthlySubscriptions,
+        quarterlySubscriptions,
         yearlySubscriptions,
         recentUsers,
         lastWeekUsers,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        userGrowthData,
+        subscriptionDistribution,
+        monthlyRevenue,
       },
     });
   } catch (error) {

@@ -36,25 +36,40 @@ export default function OyunKategoriPage() {
     }, 100);
   }, [router]);
 
-  const handleLogout = () => {
-    // Tüm localStorage verilerini temizle
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userSurname");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userPackages");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("isSubscribed");
-    localStorage.removeItem("subscriptionType");
-    localStorage.removeItem("subscriptionStartDate");
-    localStorage.removeItem("subscriptionEndDate");
-    localStorage.removeItem("subscriptionStatus");
-    localStorage.removeItem("freeTrialStarted");
-    localStorage.removeItem("freeTrialEndDate");
-    // replace kullanarak geri tuşuyla dönülemeyecek şekilde yönlendir
-    router.replace("/login");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        // Backend'e logout bildir
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Logout log error:", error);
+    } finally {
+      // Tüm localStorage verilerini temizle
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userSurname");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userPackages");
+      localStorage.removeItem("userData");
+      localStorage.removeItem("isSubscribed");
+      localStorage.removeItem("subscriptionType");
+      localStorage.removeItem("subscriptionStartDate");
+      localStorage.removeItem("subscriptionEndDate");
+      localStorage.removeItem("subscriptionStatus");
+      localStorage.removeItem("freeTrialStarted");
+      localStorage.removeItem("freeTrialEndDate");
+      // replace kullanarak geri tuşuyla dönülemeyecek şekilde yönlendir
+      router.replace("/login");
+    }
   };
 
   const oyunKategorileri = [

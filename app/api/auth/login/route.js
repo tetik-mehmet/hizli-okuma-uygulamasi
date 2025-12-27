@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import { logActivity, getClientIp, getUserAgent } from "@/lib/activityLogger";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -110,7 +111,7 @@ export async function POST(request) {
 
     console.log("✅ Kullanıcı giriş yaptı:", { email, userId: user._id });
 
-    // Abonelik durumunu kontrol et
+    // Abonelik durumunu kontrol et (ÖNCE yapılmalı)
     let subscriptionStatus = user.subscriptionStatus || "none";
     if (user.subscriptionEndDate && new Date(user.subscriptionEndDate) < new Date()) {
       subscriptionStatus = "expired";
@@ -121,6 +122,19 @@ export async function POST(request) {
         await user.save();
       }
     }
+
+    // Aktivite log kaydet (SONRA yapılmalı)
+    await logActivity({
+      userId: user._id.toString(),
+      userEmail: user.email,
+      action: "login",
+      description: "Kullanıcı giriş yaptı",
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
+      metadata: {
+        subscriptionStatus: subscriptionStatus,
+      },
+    });
 
     return NextResponse.json({
       message: "Giriş başarılı!",

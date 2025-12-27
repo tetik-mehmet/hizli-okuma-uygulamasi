@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,31 +9,122 @@ import {
   Menu,
   X,
   ChevronDown,
-  Sparkles,
   ArrowRight,
   LogIn,
   UserPlus,
+  LogOut,
+  Settings,
+  Crown,
+  Home,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-  const [showWhatsAppTooltip, setShowWhatsAppTooltip] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const emailFetchedRef = useRef(false); // Email'in API'den çekilip çekilmediğini takip et
+
+  // Kullanıcı durumu kontrolü
+  useEffect(() => {
+    const checkAuth = () => {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      const name = localStorage.getItem("userName");
+      const email = localStorage.getItem("userEmail");
+      setIsLoggedIn(loggedIn);
+      setUserName(name || "");
+
+      // Email'i localStorage'dan oku (hızlı erişim için)
+      if (email) {
+        setUserEmail(email);
+      }
+
+      // Email'i API'den çek (sadece logged in ise ve henüz çekilmediyse)
+      if (loggedIn && !emailFetchedRef.current) {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          emailFetchedRef.current = true; // Çekiliyor işaretini koy
+          fetch("/api/user/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then((res) => {
+              if (res.ok) {
+                return res.json();
+              }
+              throw new Error("Failed to fetch user");
+            })
+            .then((data) => {
+              if (data.user && data.user.email) {
+                localStorage.setItem("userEmail", data.user.email);
+                setUserEmail(data.user.email);
+                // Debug için console'a yazdır
+                console.log("User email fetched:", data.user.email);
+                console.log(
+                  "Is admin email?",
+                  data.user.email === "tetikmehmet930@gmail.com"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Email fetch error:", error);
+              emailFetchedRef.current = false; // Hata durumunda tekrar denemek için
+              // Fallback olarak localStorage'daki email'i kullan
+              if (email) {
+                setUserEmail(email);
+              }
+            });
+        } else {
+          // Token yoksa email'i temizle
+          setUserEmail("");
+        }
+      } else if (!loggedIn) {
+        // Logged out ise email'i temizle ve flag'i sıfırla
+        setUserEmail("");
+        emailFetchedRef.current = false;
+      }
+    };
+
+    checkAuth();
+    // localStorage değişikliklerini dinle (sadece state güncellemeleri için)
+    const interval = setInterval(() => {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      const name = localStorage.getItem("userName");
+      const email = localStorage.getItem("userEmail");
+      setIsLoggedIn(loggedIn);
+      setUserName(name || "");
+      if (email) {
+        setUserEmail(email);
+      } else if (!loggedIn) {
+        setUserEmail("");
+        emailFetchedRef.current = false;
+      }
+      // Eğer logged in ama email yoksa ve henüz fetch edilmediyse, tekrar dene
+      if (loggedIn && !email && !emailFetchedRef.current) {
+        checkAuth();
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
-    // Sadece anasayfada scroll listener ekle
     if (pathname !== "/") {
-      setIsScrolled(false);
+      setIsScrolled(true);
       setActiveSection("");
       return;
     }
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
 
-      // Aktif section'ı belirle
       const sections = ["features", "pricing"];
       const scrollPosition = window.scrollY + 150;
 
@@ -59,121 +150,189 @@ export default function Header() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const offset = 80; // Header yüksekliği için offset
+      const offset = 100;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
     }
     setIsMobileMenuOpen(false);
   };
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userSurname");
+      setIsLoggedIn(false);
+      setShowUserMenu(false);
+      router.push("/");
+    }
+  };
+
+  // Breadcrumb oluştur
+  const getBreadcrumbs = () => {
+    if (pathname === "/") return null;
+
+    const paths = pathname.split("/").filter(Boolean);
+    const breadcrumbs = [{ label: "Ana Sayfa", href: "/" }];
+
+    // Sayfa isimleri mapping
+    const pageNames = {
+      hakkimizda: "Hakkımızda",
+      speedmind: "SpeedMind",
+      iletisim: "İletişim",
+      login: "Giriş",
+      signup: "Kayıt Ol",
+      genel: "Genel",
+      "ogrenci-panel": "Öğrenci Paneli",
+      "yonetim-paneli": "Yönetim Paneli",
+      "subscription-expired": "Abonelik",
+      "free-trial": "Ücretsiz Deneme",
+    };
+
+    let currentPath = "";
+    paths.forEach((path, index) => {
+      currentPath += `/${path}`;
+      const label =
+        pageNames[path] ||
+        path
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+      breadcrumbs.push({
+        label,
+        href: currentPath,
+        isLast: index === paths.length - 1,
+      });
+    });
+
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = getBreadcrumbs();
 
   const navItems = [
     { label: "Özellikler", href: "#features", id: "features" },
     { label: "Fiyatlandırma", href: "#pricing", id: "pricing" },
     { label: "Hakkımızda", href: "/hakkimizda", id: "hakkimizda" },
-    {
-      label: "SpeedMind Nedir?",
-      href: "/speedmind",
-      id: "speedmind",
-    },
+    { label: "SpeedMind", href: "/speedmind", id: "speedmind" },
     { label: "İletişim", href: "/iletisim", id: "contact" },
   ];
 
   return (
-    <motion.header
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-white/90 backdrop-blur-2xl shadow-[0_18px_45px_rgba(15,23,42,0.18)] border-b border-gray-200/70"
-          : "bg-gradient-to-b from-white/95 via-white/80 to-white/40 backdrop-blur-xl shadow-[0_22px_60px_rgba(15,23,42,0.22)] border-b border-white/60"
-      }`}
-    >
-      {/* Gradient Overlay - Scroll'da kaybolur */}
-      <AnimatePresence>
-        {!isScrolled && (
-          <motion.div
-            initial={{ opacity: 0.9 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-gradient-to-r from-blue-50/70 via-orange-50/50 to-blue-50/70 pointer-events-none"
-          />
-        )}
-      </AnimatePresence>
+    <>
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isScrolled
+            ? "bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50"
+            : "bg-gradient-to-b from-white/95 via-white/90 to-white/70 backdrop-blur-2xl border-b border-white/40"
+        }`}
+      >
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-orange-500/5 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24 md:h-28 lg:h-32">
-          {/* Logo */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="flex items-center gap-3"
-          >
-            <Link
-              href="/"
-              className="flex items-center gap-3 group"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="flex items-center justify-between h-28 md:h-32">
+            {/* Logo - Optimized Size */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="flex items-center"
             >
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 4 }}
-                whileTap={{ scale: 0.96 }}
-                className="relative"
-              >
-                <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
-                  <Image
-                    src="/logo.png"
-                    alt="Hızlı Okuma Logo"
-                    width={300}
-                    height={300}
-                    className="w-full h-full object-contain"
-                    priority
-                    unoptimized
-                  />
-                </div>
-                {/* Logo Glow Effect */}
+              <Link href="/" className="flex items-center group">
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-400/40 via-orange-400/40 to-blue-400/40 rounded-full blur-xl -z-10"
-                  animate={{
-                    opacity: [0.3, 0.5, 0.3],
-                    scale: [1, 1.18, 1],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              </motion.div>
-            </Link>
-          </motion.div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item, index) => {
-              const isActive = activeSection === item.id;
-              const isExternal = !item.href.startsWith("#");
-              const isContact = item.id === "contact";
-
-              return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                  className="flex items-center gap-2"
+                  whileHover={{ scale: 1.05, rotate: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative"
                 >
-                  {isExternal ? (
-                    <Link href={item.href}>
+                  <div className="relative w-28 h-28 md:w-36 md:h-36">
+                    <Image
+                      src="/logo.png"
+                      alt="Hızlı Okuma Logo"
+                      width={144}
+                      height={144}
+                      className="w-full h-full object-contain"
+                      priority
+                      unoptimized
+                    />
+                  </div>
+                  {/* Subtle glow */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-orange-400/20 to-blue-400/20 rounded-full blur-lg -z-10"
+                    animate={{
+                      opacity: [0.3, 0.5, 0.3],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                </motion.div>
+              </Link>
+            </motion.div>
+
+            {/* Desktop Navigation - Centered */}
+            <nav className="hidden lg:flex items-center gap-0 absolute left-1/2 -translate-x-1/2 pr-8 xl:pr-12">
+              {navItems.map((item, index) => {
+                const isActive =
+                  activeSection === item.id || pathname.includes(item.id);
+                const isExternal = !item.href.startsWith("#");
+                const isLast = index === navItems.length - 1;
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + index * 0.05, duration: 0.4 }}
+                    className="flex items-center"
+                  >
+                    {isExternal ? (
+                      <Link href={item.href}>
+                        <motion.button
+                          className={`relative px-5 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                            isScrolled
+                              ? "text-gray-700 hover:text-orange-600"
+                              : "text-gray-800 hover:text-orange-600"
+                          }`}
+                          whileHover={{ y: -2 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {item.label}
+                          {isActive && (
+                            <motion.div
+                              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-orange-500 rounded-full"
+                              layoutId="activeIndicator"
+                              transition={{
+                                type: "spring",
+                                stiffness: 380,
+                                damping: 30,
+                              }}
+                            />
+                          )}
+                        </motion.button>
+                      </Link>
+                    ) : (
                       <motion.button
-                        className={`relative px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
+                        onClick={() => scrollToSection(item.id)}
+                        className={`relative px-5 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
                           isScrolled
                             ? "text-gray-700 hover:text-orange-600"
                             : "text-gray-800 hover:text-orange-600"
@@ -184,9 +343,8 @@ export default function Header() {
                         {item.label}
                         {isActive && (
                           <motion.div
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"
-                            layoutId="activeSection"
-                            initial={false}
+                            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-orange-500 rounded-full"
+                            layoutId="activeIndicator"
                             transition={{
                               type: "spring",
                               stiffness: 380,
@@ -195,321 +353,330 @@ export default function Header() {
                           />
                         )}
                       </motion.button>
-                    </Link>
-                  ) : (
-                    <motion.button
-                      onClick={() => scrollToSection(item.id)}
-                      className={`relative px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
-                        isScrolled
-                          ? "text-gray-700 hover:text-orange-600"
-                          : "text-gray-800 hover:text-orange-600"
-                      }`}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {item.label}
-                      {isActive && (
-                        <motion.div
-                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"
-                          layoutId="activeSection"
-                          initial={false}
-                          transition={{
-                            type: "spring",
-                            stiffness: 380,
-                            damping: 30,
-                          }}
-                        />
-                      )}
-                    </motion.button>
-                  )}
+                    )}
+                    {/* Modern Divider - Son item'dan önce değilse göster */}
+                    {!isLast && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.3 + index * 0.05 }}
+                        className="mx-3 h-5 w-[1.5px] bg-gradient-to-b from-gray-200 via-gray-400 to-gray-200 opacity-90"
+                      />
+                    )}
+                  </motion.div>
+                );
+              })}
+            </nav>
 
-                  {/* WhatsApp Icon - Only for Contact */}
-                  {isContact && (
+            {/* Right Side Actions */}
+            <div className="hidden lg:flex items-center gap-3 ml-auto pl-8 xl:pl-12">
+              {/* Auth Buttons Group */}
+              <div className="flex items-center gap-2">
+                {isLoggedIn ? (
+                  <>
+                    {/* User Menu */}
                     <motion.div
                       className="relative"
-                      onMouseEnter={() => setShowWhatsAppTooltip(true)}
-                      onMouseLeave={() => setShowWhatsAppTooltip(false)}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{
-                        delay: 0.3 + index * 0.1 + 0.1,
-                        duration: 0.5,
-                      }}
+                      transition={{ delay: 0.35 }}
                     >
-                      <motion.a
-                        href="https://wa.me/905304784166"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#25D366] to-[#128C7E] text-white shadow-lg shadow-[#25D366]/30 hover:shadow-xl hover:shadow-[#25D366]/40 transition-all duration-300"
-                        whileHover={{ scale: 1.1, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
+                      <motion.button
+                        onClick={() => setShowUserMenu(!showUserMenu)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-200/50 hover:from-blue-500/20 hover:to-orange-500/20 transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        <svg
-                          className="w-5 h-5"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.372a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                        </svg>
-                      </motion.a>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-orange-500 flex items-center justify-center text-white font-semibold text-sm">
+                          {userName ? userName.charAt(0).toUpperCase() : "K"}
+                        </div>
+                        <span className="font-medium text-sm text-gray-700 hidden xl:block">
+                          {userName || "Kullanıcı"}
+                        </span>
+                        <ChevronDown className="w-4 h-4 text-gray-600" />
+                      </motion.button>
 
-                      {/* Tooltip */}
                       <AnimatePresence>
-                        {showWhatsAppTooltip && (
+                        {showUserMenu && (
                           <motion.div
-                            initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10, scale: 0.9 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 z-50"
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-50"
                           >
-                            <div className="relative bg-white rounded-xl shadow-2xl border border-gray-200/50 p-4 backdrop-blur-sm">
-                              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-gray-200/50 rotate-45"></div>
-                              <p className="text-base font-semibold text-gray-700 leading-relaxed">
-                                Soru ve talepleriniz için teknik destek
-                                hattımıza mesaj atabilirsiniz. Ekiplerimiz size
-                                en kısa süre içerisinde dönüş yapacaklardır.
-                              </p>
+                            <div className="p-2">
+                              {userEmail &&
+                                userEmail.toLowerCase() ===
+                                  "tetikmehmet930@gmail.com" && (
+                                  <Link href="/yonetim-paneli">
+                                    <motion.button
+                                      className="w-full text-left px-4 py-2.5 rounded-lg hover:bg-gray-100/50 transition-colors flex items-center gap-3 text-sm text-gray-700"
+                                      whileHover={{ x: 4 }}
+                                      onClick={() => setShowUserMenu(false)}
+                                    >
+                                      <Settings className="w-4 h-4" />
+                                      Ayarlar
+                                    </motion.button>
+                                  </Link>
+                                )}
+                              {userEmail &&
+                                userEmail.toLowerCase() ===
+                                  "tetikmehmet930@gmail.com" && (
+                                  <div className="h-px bg-gray-200/50 my-1" />
+                                )}
+                              <motion.button
+                                onClick={handleLogout}
+                                className="w-full text-left px-4 py-2.5 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-3 text-sm text-red-600"
+                                whileHover={{ x: 4 }}
+                              >
+                                <LogOut className="w-4 h-4" />
+                                Çıkış Yap
+                              </motion.button>
                             </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </motion.div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </nav>
-
-          {/* CTA Buttons - Desktop */}
-          <div className="hidden lg:flex items-center gap-3">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-            >
-              <Link href="/login">
-                <motion.button
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                    isScrolled
-                      ? "text-gray-700 hover:text-orange-600 border border-gray-300 hover:border-orange-300 bg-white/50 backdrop-blur-sm"
-                      : "text-gray-800 hover:text-orange-600 border border-gray-200 hover:border-orange-300 bg-white/40 backdrop-blur-md"
-                  }`}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <LogIn className="w-4 h-4" />
-                  Giriş Yap
-                </motion.button>
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <Link href="/signup">
-                <motion.button
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all duration-300"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Üye Ol
-                  <ArrowRight className="w-4 h-4" />
-                </motion.button>
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`lg:hidden p-2.5 rounded-xl transition-all duration-300 border ${
-              isScrolled
-                ? "text-gray-700 bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm"
-                : "text-gray-800 bg-white/60 backdrop-blur-md border-gray-200/50"
-            }`}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Menu"
-          >
-            <AnimatePresence mode="wait">
-              {isMobileMenuOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X className="w-6 h-6" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Menu className="w-6 h-6" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
-            />
-
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "100%", opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-24 md:top-28 lg:top-32 right-0 bottom-0 w-[280px] sm:w-[320px] max-w-[90vw] bg-white/98 backdrop-blur-xl shadow-2xl z-50 lg:hidden border-l border-gray-200/50 overflow-y-auto"
-            >
-              <div className="flex flex-col h-full p-4 sm:p-6">
-                {/* Navigation Links */}
-                <nav className="flex flex-col gap-2 mb-4 sm:mb-6">
-                  {navItems.map((item, index) => {
-                    const isActive = activeSection === item.id;
-                    const isExternal = !item.href.startsWith("#");
-                    const isContact = item.id === "contact";
-
-                    return (
-                      <motion.div
-                        key={item.id}
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <motion.button
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-gray-700 hover:text-orange-600 border border-gray-300/50 hover:border-orange-300 bg-white/50 backdrop-blur-sm transition-all"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={isContact ? "flex items-center gap-2" : ""}
+                        transition={{ delay: 0.4 }}
                       >
-                        {isExternal ? (
-                          <Link
-                            href={item.href}
-                            className={isContact ? "flex-1" : ""}
-                          >
-                            <motion.button
+                        <LogIn className="w-4 h-4" />
+                        Giriş Yap
+                      </motion.button>
+                    </Link>
+
+                    <Link href="/signup">
+                      <motion.button
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl transition-all"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        Üye Ol
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.button>
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2.5 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-sm"
+              whileTap={{ scale: 0.95 }}
+              aria-label="Menu"
+            >
+              <AnimatePresence mode="wait">
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6 text-gray-700" />
+                ) : (
+                  <Menu className="w-6 h-6 text-gray-700" />
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Breadcrumb - Show only on non-home pages */}
+        {breadcrumbs && breadcrumbs.length > 1 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3">
+            <nav className="flex items-center gap-2 text-sm">
+              {breadcrumbs.map((crumb, index) => (
+                <div key={crumb.href} className="flex items-center gap-2">
+                  {index === 0 ? (
+                    <Link
+                      href={crumb.href}
+                      className="flex items-center gap-1 text-gray-600 hover:text-orange-600 transition-colors"
+                    >
+                      <Home className="w-4 h-4" />
+                    </Link>
+                  ) : crumb.isLast ? (
+                    <span className="text-gray-900 font-medium">
+                      {crumb.label}
+                    </span>
+                  ) : (
+                    <Link
+                      href={crumb.href}
+                      className="text-gray-600 hover:text-orange-600 transition-colors"
+                    >
+                      {crumb.label}
+                    </Link>
+                  )}
+                  {!crumb.isLast && (
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+        )}
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+              />
+
+              {/* Menu Panel */}
+              <motion.div
+                initial={{ x: "100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed top-28 md:top-32 right-0 bottom-0 w-[320px] max-w-[85vw] bg-white/98 backdrop-blur-xl shadow-2xl z-50 lg:hidden border-l border-gray-200/50 overflow-y-auto"
+              >
+                <div className="flex flex-col h-full p-6">
+                  {/* User Info (if logged in) */}
+                  {isLoggedIn && (
+                    <div className="mb-6 pb-6 border-b border-gray-200/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-orange-500 flex items-center justify-center text-white font-bold">
+                          {userName ? userName.charAt(0).toUpperCase() : "K"}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            {userName || "Kullanıcı"}
+                          </p>
+                          <p className="text-xs text-gray-600">Üye</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Navigation */}
+                  <nav className="flex flex-col gap-2 mb-6">
+                    {navItems.map((item, index) => {
+                      const isExternal = !item.href.startsWith("#");
+                      return (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          {isExternal ? (
+                            <Link
+                              href={item.href}
                               onClick={() => setIsMobileMenuOpen(false)}
-                              className={`w-full text-left px-4 py-3.5 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 ${
-                                isActive
-                                  ? "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-600 border border-orange-200"
-                                  : "text-gray-700 hover:bg-gray-50 border border-transparent"
-                              }`}
+                            >
+                              <motion.button
+                                className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                whileTap={{ scale: 0.98 }}
+                              >
+                                {item.label}
+                              </motion.button>
+                            </Link>
+                          ) : (
+                            <motion.button
+                              onClick={() => scrollToSection(item.id)}
+                              className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
                               whileTap={{ scale: 0.98 }}
                             >
                               {item.label}
                             </motion.button>
-                          </Link>
-                        ) : (
-                          <motion.button
-                            onClick={() => scrollToSection(item.id)}
-                            className={`w-full text-left px-4 py-3.5 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 ${
-                              isActive
-                                ? "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-600 border border-orange-200"
-                                : "text-gray-700 hover:bg-gray-50 border border-transparent"
-                            }`}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            {item.label}
-                          </motion.button>
-                        )}
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </nav>
 
-                        {/* WhatsApp Icon - Mobile - Only for Contact */}
-                        {isContact && (
-                          <motion.a
-                            href="https://wa.me/905304784166"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                  {/* CTA Buttons */}
+                  {!isLoggedIn ? (
+                    <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-gray-200/50">
+                      <Link
+                        href="/login"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <motion.button
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all"
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <LogIn className="w-5 h-5" />
+                          Giriş Yap
+                        </motion.button>
+                      </Link>
+                      <Link
+                        href="/signup"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <motion.button
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <UserPlus className="w-5 h-5" />
+                          Üye Ol
+                          <ArrowRight className="w-5 h-5" />
+                        </motion.button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-gray-200/50">
+                      {userEmail &&
+                        userEmail.toLowerCase() ===
+                          "tetikmehmet930@gmail.com" && (
+                          <Link
+                            href="/yonetim-paneli"
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#25D366] to-[#128C7E] text-white shadow-lg shadow-[#25D366]/30 transition-all duration-300"
-                            whileTap={{ scale: 0.95 }}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.1 + 0.1 }}
                           >
-                            <svg
-                              className="w-6 h-6"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
+                            <motion.button
+                              className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all"
+                              whileTap={{ scale: 0.98 }}
                             >
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.372a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                            </svg>
-                          </motion.a>
+                              <Settings className="w-5 h-5" />
+                              Ayarlar
+                            </motion.button>
+                          </Link>
                         )}
-                      </motion.div>
-                    );
-                  })}
-                </nav>
-
-                {/* Divider */}
-                <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-4 sm:my-6" />
-
-                {/* CTA Buttons */}
-                <div className="flex flex-col gap-3 mt-auto pb-4 sm:pb-6">
-                  <Link href="/login">
-                    <motion.button
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-sm sm:text-base text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all duration-300 shadow-sm"
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />
-                      Giriş Yap
-                    </motion.button>
-                  </Link>
-
-                  <Link href="/signup">
-                    <motion.button
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-sm sm:text-base bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl transition-all duration-300"
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                      Üye Ol
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </motion.button>
-                  </Link>
+                      <motion.button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all"
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <LogOut className="w-5 h-5" />
+                        Çıkış Yap
+                      </motion.button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
-      {/* Shine Effect on Scroll */}
-      {isScrolled && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
-          animate={{
-            x: ["-100%", "200%"],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            repeatDelay: 2,
-            ease: "linear",
-          }}
-        />
-      )}
-    </motion.header>
+        {/* Click outside to close menus */}
+        {showUserMenu && (
+          <div
+            className="fixed inset-0 z-30"
+            onClick={() => {
+              setShowUserMenu(false);
+            }}
+          />
+        )}
+      </motion.header>
+    </>
   );
 }

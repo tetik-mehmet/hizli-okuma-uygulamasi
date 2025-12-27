@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { checkAdminAccess } from "@/lib/adminAuth";
+import { logActivity, getClientIp, getUserAgent } from "@/lib/activityLogger";
 import mongoose from "mongoose";
 
 /**
@@ -211,13 +212,16 @@ export async function PUT(request, { params }) {
 
         switch (user.subscriptionType) {
           case "monthly":
-            endDate.setDate(endDate.getDate() + 30);
+            // 1 ay sonrası (gerçek ay hesabı)
+            endDate.setMonth(endDate.getMonth() + 1);
             break;
           case "quarterly":
-            endDate.setDate(endDate.getDate() + 90);
+            // 3 ay sonrası
+            endDate.setMonth(endDate.getMonth() + 3);
             break;
           case "yearly":
-            endDate.setDate(endDate.getDate() + 365);
+            // 1 yıl sonrası
+            endDate.setFullYear(endDate.getFullYear() + 1);
             break;
         }
 
@@ -276,6 +280,21 @@ export async function PUT(request, { params }) {
       freeTrialEndDate: user.freeTrialEndDate,
     };
 
+    // Aktivite log kaydet
+    await logActivity({
+      userId: adminCheck.email, // Admin email
+      userEmail: adminCheck.email,
+      action: "admin_action",
+      description: `Kullanıcı güncellendi: ${user.email}`,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
+      metadata: {
+        targetUserId: id,
+        targetUserEmail: user.email,
+        changes: body,
+      },
+    });
+
     return NextResponse.json({
       message: "Kullanıcı başarıyla güncellendi",
       user: safeUser,
@@ -330,6 +349,21 @@ export async function DELETE(request, { params }) {
         { status: 404 }
       );
     }
+
+    // Aktivite log kaydet
+    await logActivity({
+      userId: adminCheck.email, // Admin email
+      userEmail: adminCheck.email,
+      action: "admin_action",
+      description: `Kullanıcı silindi: ${user.email}`,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
+      metadata: {
+        targetUserId: id,
+        targetUserEmail: user.email,
+        action: "user_delete",
+      },
+    });
 
     return NextResponse.json({
       message: "Kullanıcı başarıyla silindi",

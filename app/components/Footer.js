@@ -145,7 +145,7 @@ export default function Footer({ fixed = false }) {
                     href="mailto:info@hizliokuma.app"
                     className="text-blue-600 hover:underline"
                   >
-                    info@hizliokuma.app
+                    info@odakanatolia.com
                   </a>
                 </p>
                 <p>
@@ -154,7 +154,7 @@ export default function Footer({ fixed = false }) {
                     href="tel:+905551112233"
                     className="text-blue-600 hover:underline"
                   >
-                    +90 (555) 111 22 33
+                    +90 (530) 478 41 66
                   </a>
                 </p>
               </div>

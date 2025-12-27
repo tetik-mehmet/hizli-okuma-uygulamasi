@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { checkSubscriptionAccess } from "@/lib/checkSubscriptionAccess";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -12,10 +13,12 @@ export async function middleware(request) {
     "/login",
     "/signup",
     "/free-trial",
+    "/subscription-expired",
     "/api/auth/login",
     "/api/auth/signup",
     "/api/subscription/purchase",
     "/api/free-trial/start",
+    "/api/cron",
   ];
 
   if (
@@ -46,18 +49,29 @@ export async function middleware(request) {
       return NextResponse.next();
     }
 
-    // Token'ı doğrula (sadece token geçerliliği kontrol edilir, veritabanı işlemi yapılmaz)
+    // Token'ı doğrula
+    let decoded;
     try {
-      jwt.verify(token, JWT_SECRET);
-      // Token geçerli, sayfaya erişime izin ver
-      // Detaylı abonelik ve ücretsiz deneme kontrolleri client-side'da yapılacak
-      return NextResponse.next();
+      decoded = jwt.verify(token, JWT_SECRET);
     } catch (error) {
       // Geçersiz token, login sayfasına yönlendir
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }
+
+    // /genel altındaki sayfalar için server-side abonelik kontrolü
+    if (pathname.startsWith("/genel")) {
+      const accessCheck = await checkSubscriptionAccess(decoded.userId, pathname);
+      if (!accessCheck.hasAccess) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/subscription-expired";
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // Token geçerli ve erişim kontrolü başarılı
+    return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);
     // Hata durumunda login sayfasına yönlendir
