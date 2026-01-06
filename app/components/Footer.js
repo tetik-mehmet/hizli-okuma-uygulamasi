@@ -1,7 +1,12 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Shield } from "lucide-react";
 
 export default function Footer({ fixed = false }) {
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+
   return (
     <footer
       className={`w-full text-gray-800 font-inter ${
@@ -99,29 +104,12 @@ export default function Footer({ fixed = false }) {
                   </Link>
                 </li>
                 <li>
-                  {/* Henüz sayfa yoksa ileride /gizlilik-politikasi olarak eklenebilir */}
-                  <Link
-                    href="#"
-                    className="text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-colors"
+                  <button
+                    onClick={() => setIsPrivacyModalOpen(true)}
+                    className="text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-colors text-left"
                   >
                     Gizlilik Politikası
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-colors"
-                  >
-                    Kullanım Koşulları
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-gray-600 hover:text-blue-600 hover:underline underline-offset-4 transition-colors"
-                  >
-                    Çerez Politikası
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -232,6 +220,218 @@ export default function Footer({ fixed = false }) {
           </div>
         </div>
       </div>
+
+      {/* Gizlilik Politikası Modal */}
+      <AnimatePresence>
+        {isPrivacyModalOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsPrivacyModalOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998]"
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-[9999] sm:max-w-4xl sm:w-full max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-orange-50 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-orange-500">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Gizlilik Politikası
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setIsPrivacyModalOpen(false)}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-label="Kapat"
+                >
+                  <X className="w-6 h-6 text-gray-600" />
+                </button>
+              </div>
+
+              {/* Modal Content - Scrollable */}
+              <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+                <div className="max-w-3xl mx-auto space-y-6 text-gray-700">
+                  {/* 1. Genel Bilgiler */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        1
+                      </span>
+                      Genel Bilgiler
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10">
+                      Odak Anatolia Akademi olarak, kullanıcılarımızın
+                      gizliliğine büyük önem veriyoruz. Bu Gizlilik Politikası,
+                      web sitemiz ve mobil platformlarımız aracılığıyla toplanan
+                      bilgilerin nasıl toplandığını, kullanıldığını, korunduğunu
+                      ve paylaşıldığını açıklar.
+                    </p>
+                  </section>
+
+                  {/* 2. Toplanan Bilgiler */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        2
+                      </span>
+                      Toplanan Bilgiler
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10 mb-3">
+                      Platformumuzda aşağıdaki bilgileri toplayabiliriz:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 pl-10 text-base leading-relaxed">
+                      <li>Ad, soyad, e-posta adresi, telefon numarası</li>
+                      <li>Kullanıcı adı, parola</li>
+                      <li>IP adresi, tarayıcı bilgisi, cihaz türü</li>
+                      <li>
+                        Eğitim geçmişi ve platform üzerindeki etkileşim
+                        bilgileri
+                      </li>
+                      <li>Geri bildirimler, yorumlar veya destek talepleri</li>
+                    </ul>
+                  </section>
+
+                  {/* 3. Bilgilerin Kullanım Amaçları */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        3
+                      </span>
+                      Bilgilerin Kullanım Amaçları
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10 mb-3">
+                      Toplanan bilgiler şu amaçlarla kullanılabilir:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 pl-10 text-base leading-relaxed">
+                      <li>
+                        Üyelik ve kimlik doğrulama süreçlerinin yürütülmesi
+                      </li>
+                      <li>
+                        Eğitim içeriklerine erişim ve kullanıcı deneyiminin
+                        geliştirilmesi
+                      </li>
+                      <li>Sistem güvenliği ve performans optimizasyonu</li>
+                      <li>
+                        Kullanıcılara bilgilendirme, duyuru ve kampanya iletimi
+                      </li>
+                      <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+                    </ul>
+                  </section>
+
+                  {/* 4. Verilerin Saklanması ve Güvenliği */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        4
+                      </span>
+                      Verilerin Saklanması ve Güvenliği
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10">
+                      Verileriniz güvenli sunucularda, şifrelenmiş bağlantılar
+                      (SSL) aracılığıyla korunur. Kredi kartı veya ödeme
+                      bilgileri, yalnızca ödeme sağlayıcısı (örneğin iyzico,
+                      Stripe vb.) tarafından işlenir ve sistemimizde saklanmaz.
+                      Veriler, yasal süre boyunca saklanır ve süresi dolduğunda
+                      güvenli şekilde silinir.
+                    </p>
+                  </section>
+
+                  {/* 5. Bilgilerin Paylaşımı */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        5
+                      </span>
+                      Bilgilerin Paylaşımı
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10 mb-3">
+                      Kişisel verileriniz, yalnızca aşağıdaki durumlarda
+                      paylaşılabilir:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 pl-10 text-base leading-relaxed">
+                      <li>Yasal yükümlülük gereği resmi kurumlarla,</li>
+                      <li>
+                        Hizmet aldığımız iş ortakları (barındırma, e-posta,
+                        güvenlik sağlayıcıları) ile,
+                      </li>
+                      <li>Açık rızanızla belirttiğiniz üçüncü taraflarla.</li>
+                    </ul>
+                    <p className="text-base leading-relaxed pl-10 mt-3 font-semibold text-gray-900">
+                      Hiçbir durumda kişisel verileriniz üçüncü kişilere
+                      satılmaz.
+                    </p>
+                  </section>
+
+                  {/* 6. Çocukların Gizliliği */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        6
+                      </span>
+                      Çocukların Gizliliği
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10">
+                      Hipnodil Akademi, 18 yaşından küçük kişilerden bilerek
+                      veri toplamaz. Yanlışlıkla alınan bilgiler tespit
+                      edildiğinde derhal silinir.
+                    </p>
+                  </section>
+
+                  {/* 7. Haklarınız */}
+                  <section>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold text-sm">
+                        7
+                      </span>
+                      Haklarınız
+                    </h3>
+                    <p className="text-base leading-relaxed pl-10 mb-3">
+                      KVKK madde 11 kapsamında, kişisel verilerinizle ilgili:
+                      Bilgi talep etme, düzeltme veya silinmesini isteme,
+                      işlenmesine itiraz etme haklarına sahipsiniz.
+                    </p>
+                    <p className="text-base leading-relaxed pl-10">
+                      Taleplerinizi{" "}
+                      <a
+                        href="mailto:hipnodilakademi@gmail.com"
+                        className="text-blue-600 hover:text-blue-700 hover:underline font-semibold"
+                      >
+                        info@odakanatolia.com
+                      </a>{" "}
+                      adresine gönderebilirsiniz.
+                    </p>
+                  </section>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                <motion.button
+                  onClick={() => setIsPrivacyModalOpen(false)}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-orange-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Kapat
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </footer>
   );
 }

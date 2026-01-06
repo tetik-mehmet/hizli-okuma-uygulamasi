@@ -148,14 +148,32 @@ export default function Header() {
   }, [pathname]);
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 100;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-    }
     setIsMobileMenuOpen(false);
+    // Eğer anasayfada değilsek, önce anasayfaya git
+    if (pathname !== "/") {
+      router.push(`/#${sectionId}`);
+      // Sayfa yüklendikten sonra scroll yap
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const offset = 100;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      // Anasayfadaysak direkt scroll yap
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const offset = 100;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        }
+      }, 100);
+    }
   };
 
   const handleLogout = async () => {
@@ -545,6 +563,7 @@ export default function Header() {
                 exit={{ x: "100%", opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
                 className="fixed top-28 md:top-32 right-0 bottom-0 w-[320px] max-w-[85vw] bg-white/98 backdrop-blur-xl shadow-2xl z-50 lg:hidden border-l border-gray-200/50 overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex flex-col h-full p-6">
                   {/* User Info (if logged in) */}
@@ -578,18 +597,25 @@ export default function Header() {
                           {isExternal ? (
                             <Link
                               href={item.href}
-                              onClick={() => setIsMobileMenuOpen(false)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className="block w-full"
                             >
-                              <motion.button
-                                className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
+                              <motion.div
+                                className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors cursor-pointer"
                                 whileTap={{ scale: 0.98 }}
                               >
                                 {item.label}
-                              </motion.button>
+                              </motion.div>
                             </Link>
                           ) : (
                             <motion.button
-                              onClick={() => scrollToSection(item.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                scrollToSection(item.id);
+                              }}
                               className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
                               whileTap={{ scale: 0.98 }}
                             >
@@ -606,28 +632,36 @@ export default function Header() {
                     <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-gray-200/50">
                       <Link
                         href="/login"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="block w-full"
                       >
-                        <motion.button
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all"
+                        <motion.div
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all cursor-pointer"
                           whileTap={{ scale: 0.98 }}
                         >
                           <LogIn className="w-5 h-5" />
                           Giriş Yap
-                        </motion.button>
+                        </motion.div>
                       </Link>
                       <Link
                         href="/signup"
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="block w-full"
                       >
-                        <motion.button
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
+                        <motion.div
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg cursor-pointer"
                           whileTap={{ scale: 0.98 }}
                         >
                           <UserPlus className="w-5 h-5" />
                           Üye Ol
                           <ArrowRight className="w-5 h-5" />
-                        </motion.button>
+                        </motion.div>
                       </Link>
                     </div>
                   ) : (
@@ -637,19 +671,24 @@ export default function Header() {
                           "tetikmehmet930@gmail.com" && (
                           <Link
                             href="/yonetim-paneli"
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="block w-full"
                           >
-                            <motion.button
-                              className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all"
+                            <motion.div
+                              className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all cursor-pointer"
                               whileTap={{ scale: 0.98 }}
                             >
                               <Settings className="w-5 h-5" />
                               Ayarlar
-                            </motion.button>
+                            </motion.div>
                           </Link>
                         )}
                       <motion.button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
