@@ -17,7 +17,6 @@ import {
   Zap,
   BookOpen,
   TrendingUp,
-  Star,
   Users,
   Phone,
 } from "lucide-react";
@@ -144,8 +143,11 @@ export default function SignupPage() {
       isValid = false;
     }
 
-    // Telefon numarası validasyonu (opsiyonel ama girilmişse format kontrolü)
-    if (form.phone.trim()) {
+    // Telefon numarası validasyonu (zorunlu)
+    if (!form.phone.trim()) {
+      errors.phone = "Telefon numarası alanı zorunludur.";
+      isValid = false;
+    } else {
       const phoneRegex = /^[\d\s\+\-\(\)]+$/;
       const cleanPhone = form.phone.replace(/\s/g, "");
       if (!phoneRegex.test(form.phone)) {
@@ -324,65 +326,12 @@ export default function SignupPage() {
             transition={{ delay: 0.8, duration: 0.5 }}
             className="bg-white/80 backdrop-blur-xl rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/30 shadow-lg"
           >
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-1 md:-space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 border-2 border-white flex items-center justify-center text-white font-bold text-xs md:text-sm"
-                    >
-                      {String.fromCharCode(64 + i)}
-                    </div>
-                  ))}
-                </div>
-                <div className="ml-1 md:ml-2">
-                  <div className="flex items-center gap-0.5 md:gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star
-                        key={i}
-                        className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    <span className="font-bold text-gray-800">4.9/5</span> puan
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2 md:space-y-3">
-              <div className="flex items-start gap-2 md:gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white font-bold flex-shrink-0 text-xs md:text-sm">
-                  A
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1 mb-0.5 md:mb-1">
-                    <span className="font-semibold text-xs md:text-sm text-gray-800">
-                      Ayşe K.
-                    </span>
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <Star
-                          key={i}
-                          className="w-2.5 h-2.5 md:w-3 md:h-3 fill-yellow-400 text-yellow-400"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    &quot;Okuma hızım 2 haftada 3 katına çıktı! Kesinlikle
-                    tavsiye ederim.&quot;
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
-                <Users className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                <p className="text-xs md:text-sm text-gray-700">
-                  <span className="font-bold text-gray-900">10,000+</span> aktif
-                  kullanıcı
-                </p>
-              </div>
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+              <p className="text-xs md:text-sm text-gray-700">
+                <span className="font-bold text-gray-900">10,000+</span> aktif
+                kullanıcı
+              </p>
             </div>
           </motion.div>
         </motion.div>
@@ -440,7 +389,7 @@ export default function SignupPage() {
                     type="text"
                     name="name"
                     placeholder="Adınızı girin"
-                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base ${
+                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base text-black placeholder:text-gray-500 placeholder:opacity-70 ${
                       fieldErrors.name
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-pink-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
@@ -474,7 +423,7 @@ export default function SignupPage() {
                     type="text"
                     name="surname"
                     placeholder="Soyadınızı girin"
-                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base ${
+                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base text-black placeholder:text-gray-500 placeholder:opacity-70 ${
                       fieldErrors.surname
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-pink-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
@@ -508,7 +457,7 @@ export default function SignupPage() {
                     type="email"
                     name="email"
                     placeholder="ornek@email.com"
-                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base ${
+                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base text-black placeholder:text-gray-500 placeholder:opacity-70 ${
                       fieldErrors.email
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-pink-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
@@ -542,7 +491,7 @@ export default function SignupPage() {
                     type="tel"
                     name="phone"
                     placeholder="+90 555 123 4567 veya 0555 123 4567"
-                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base ${
+                    className={`w-full px-4 py-3.5 pl-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base text-black placeholder:text-gray-500 placeholder:opacity-70 ${
                       fieldErrors.phone
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : "border-pink-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
@@ -583,7 +532,7 @@ export default function SignupPage() {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="En az 8 karakter - Güçlü şifre oluşturun"
-                    className={`w-full px-4 py-3.5 pl-12 pr-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base ${
+                    className={`w-full px-4 py-3.5 pl-12 pr-12 border-2 rounded-xl focus:outline-none transition-all duration-200 bg-white/90 backdrop-blur-sm text-base text-black placeholder:text-gray-500 placeholder:opacity-70 ${
                       fieldErrors.password
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                         : form.password && passwordStrength.strength >= 3

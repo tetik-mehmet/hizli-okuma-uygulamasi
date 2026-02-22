@@ -124,8 +124,15 @@ export default function Footer({ fixed = false }) {
                   Hızlı Okuma Uygulaması
                 </p>
                 <p>
-                  <span className="font-semibold">Adres:</span> İstanbul /
-                  Türkiye
+                  <span className="font-semibold">Adres:</span>{" "}
+                  <a
+                    href="https://www.google.com/maps?q=Ba%C4%9Fl%C4%B1ca%20Mah.%20Hilal%20Cad.%2013%2F2%20Etimesgut%2FANKARA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline break-words"
+                  >
+                    Bağlıca Mah. Hilal Cad. 13/2 Etimesgut/ANKARA
+                  </a>
                 </p>
                 <p>
                   <span className="font-semibold">E-posta:</span>{" "}
@@ -139,12 +146,35 @@ export default function Footer({ fixed = false }) {
                 <p>
                   <span className="font-semibold">Telefon:</span>{" "}
                   <a
-                    href="tel:+905551112233"
+                    href="tel:+905350123295"
                     className="text-blue-600 hover:underline"
                   >
-                    +90 (530) 478 41 66
+                    +90 (535) 012 32 95
                   </a>
                 </p>
+              </div>
+
+              {/* Harita */}
+              <div className="mt-4 rounded-lg overflow-hidden border border-gray-200 shadow-sm w-full max-w-[280px] sm:max-w-xs">
+                <a
+                  href="https://www.google.com/maps?q=Ba%C4%9Fl%C4%B1ca%20Mah.%20Hilal%20Cad.%2013%2F2%20Etimesgut%2FANKARA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  aria-label="Haritada aç"
+                >
+                  <iframe
+                    src="https://www.google.com/maps?q=Ba%C4%9Fl%C4%B1ca+Mah.+Hilal+Cad.+13%2F2+Etimesgut%2FANKARA&output=embed"
+                    width="100%"
+                    height="160"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Ofis konumu haritası"
+                    className="w-full"
+                  />
+                </a>
               </div>
 
               {/* Sosyal medya */}
