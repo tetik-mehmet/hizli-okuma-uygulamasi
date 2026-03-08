@@ -405,6 +405,21 @@ export default function LoginPage() {
                     </motion.div>
                   </motion.div>
 
+                  {/* Forgot Password Link */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.55 }}
+                    className="flex justify-end -mt-2"
+                  >
+                    <Link
+                      href="/forgot-password"
+                      className="text-white/60 hover:text-yellow-300 text-xs transition-colors duration-200 underline underline-offset-4"
+                    >
+                      Şifremi unuttum
+                    </Link>
+                  </motion.div>
+
                   {/* Submit Button */}
                   <motion.button
                     type="submit"

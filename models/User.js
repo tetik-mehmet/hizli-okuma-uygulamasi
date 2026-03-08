@@ -62,7 +62,15 @@ const userSchema = new mongoose.Schema({
   freeTrialEndDate: {
     type: Date,
     default: null,
-    index: true, // Index ekle
+    index: true,
+  },
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null,
   },
 }, {
   // Schema seviyesinde index'ler
