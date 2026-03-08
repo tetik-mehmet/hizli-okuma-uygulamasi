@@ -51,7 +51,7 @@ export async function POST(request) {
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "onboarding@resend.dev",
       to: user.email,
-      subject: "Şifre Sıfırlama Talebi — Hızlı Okuma",
+      subject: "Şifre Sıfırlama Talebi — OdakAnatolia",
       html: `
         <!DOCTYPE html>
         <html lang="tr">
@@ -72,7 +72,7 @@ export async function POST(request) {
                         🔐 Şifre Sıfırlama
                       </h1>
                       <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">
-                        Hızlı Okuma Platformu
+                        OdakAnatolia
                       </p>
                     </td>
                   </tr>
@@ -121,7 +121,7 @@ export async function POST(request) {
                   <tr>
                     <td style="padding:24px 32px;border-top:1px solid rgba(255,255,255,0.08);text-align:center;">
                       <p style="margin:0;color:rgba(255,255,255,0.35);font-size:12px;">
-                        © ${new Date().getFullYear()} Hızlı Okuma Platformu. Tüm hakları saklıdır.
+                        © ${new Date().getFullYear()} OdakAnatolia. Tüm hakları saklıdır.
                       </p>
                     </td>
                   </tr>

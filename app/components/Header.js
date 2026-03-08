@@ -70,7 +70,7 @@ export default function Header() {
                 console.log("User email fetched:", data.user.email);
                 console.log(
                   "Is admin email?",
-                  data.user.email === "tetikmehmet930@gmail.com"
+                  data.user.email === "tetikmehmet930@gmail.com",
                 );
               }
             })
@@ -244,7 +244,6 @@ export default function Header() {
     { label: "Özellikler", href: "#features", id: "features" },
     { label: "Fiyatlandırma", href: "#pricing", id: "pricing" },
     { label: "Hakkımızda", href: "/hakkimizda", id: "hakkimizda" },
-    { label: "SpeedMind", href: "/speedmind", id: "speedmind" },
     { label: "İletişim", href: "/iletisim", id: "contact" },
   ];
 
@@ -265,7 +264,7 @@ export default function Header() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex items-center justify-between h-28 md:h-32">
-            {/* Logo - Optimized Size */}
+            {/* Logo */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -278,30 +277,32 @@ export default function Header() {
                   whileTap={{ scale: 0.95 }}
                   className="relative"
                 >
-                  <div className="relative w-28 h-28 md:w-36 md:h-36">
+                  <div className="relative w-44 h-44 md:w-64 md:h-64 overflow-hidden">
                     <Image
-                      src="/logo.png"
+                      src="/gercek_logo.png"
                       alt="Hızlı Okuma - Okuma Hızınızı 3 Kat Artırın"
-                      width={144}
-                      height={144}
+                      width={256}
+                      height={256}
                       className="w-full h-full object-contain"
                       priority
                       unoptimized
                     />
+                    {/* Sol taraftan gelen ışık sweep efekti */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.65) 50%, transparent 70%)",
+                      }}
+                      animate={{ x: ["-120%", "120%"] }}
+                      transition={{
+                        duration: 1.8,
+                        repeat: Infinity,
+                        repeatDelay: 2.5,
+                        ease: "easeInOut",
+                      }}
+                    />
                   </div>
-                  {/* Subtle glow */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-orange-400/20 to-blue-400/20 rounded-full blur-lg -z-10"
-                    animate={{
-                      opacity: [0.3, 0.5, 0.3],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
                 </motion.div>
               </Link>
             </motion.div>
@@ -325,7 +326,7 @@ export default function Header() {
                     {isExternal ? (
                       <Link href={item.href}>
                         <motion.button
-                          className={`relative px-5 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                          className={`relative px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 ${
                             isScrolled
                               ? "text-gray-700 hover:text-orange-600"
                               : "text-gray-800 hover:text-orange-600"
@@ -350,7 +351,7 @@ export default function Header() {
                     ) : (
                       <motion.button
                         onClick={() => scrollToSection(item.id)}
-                        className={`relative px-5 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                        className={`relative px-6 py-3 rounded-lg font-medium text-lg transition-all duration-300 ${
                           isScrolled
                             ? "text-gray-700 hover:text-orange-600"
                             : "text-gray-800 hover:text-orange-600"
@@ -378,7 +379,7 @@ export default function Header() {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 + index * 0.05 }}
-                        className="mx-3 h-5 w-[1.5px] bg-gradient-to-b from-gray-200 via-gray-400 to-gray-200 opacity-90"
+                        className="mx-4 h-6 w-[1.5px] bg-gradient-to-b from-gray-200 via-gray-400 to-gray-200 opacity-90"
                       />
                     )}
                   </motion.div>
@@ -401,14 +402,14 @@ export default function Header() {
                     >
                       <motion.button
                         onClick={() => setShowUserMenu(!showUserMenu)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-200/50 hover:from-blue-500/20 hover:to-orange-500/20 transition-all"
+                        className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-gray-200/50 hover:from-blue-500/20 hover:to-orange-500/20 transition-all"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-orange-500 flex items-center justify-center text-white font-semibold text-sm">
                           {userName ? userName.charAt(0).toUpperCase() : "K"}
                         </div>
-                        <span className="font-medium text-sm text-gray-700 hidden xl:block">
+                        <span className="font-medium text-base text-gray-700 hidden xl:block">
                           {userName || "Kullanıcı"}
                         </span>
                         <ChevronDown className="w-4 h-4 text-gray-600" />
@@ -428,7 +429,7 @@ export default function Header() {
                                   "tetikmehmet930@gmail.com" && (
                                   <Link href="/yonetim-paneli">
                                     <motion.button
-                                      className="w-full text-left px-4 py-2.5 rounded-lg hover:bg-gray-100/50 transition-colors flex items-center gap-3 text-sm text-gray-700"
+                                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100/50 transition-colors flex items-center gap-3 text-base text-gray-700"
                                       whileHover={{ x: 4 }}
                                       onClick={() => setShowUserMenu(false)}
                                     >
@@ -444,7 +445,7 @@ export default function Header() {
                                 )}
                               <motion.button
                                 onClick={handleLogout}
-                                className="w-full text-left px-4 py-2.5 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-3 text-sm text-red-600"
+                                className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-3 text-base text-red-600"
                                 whileHover={{ x: 4 }}
                               >
                                 <LogOut className="w-4 h-4" />
@@ -460,7 +461,7 @@ export default function Header() {
                   <>
                     <Link href="/login">
                       <motion.button
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-gray-700 hover:text-orange-600 border border-gray-300/50 hover:border-orange-300 bg-white/50 backdrop-blur-sm transition-all"
+                        className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-base text-gray-700 hover:text-orange-600 border border-gray-300/50 hover:border-orange-300 bg-white/50 backdrop-blur-sm transition-all"
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                         initial={{ opacity: 0, x: 20 }}
@@ -474,7 +475,7 @@ export default function Header() {
 
                     <Link href="/signup">
                       <motion.button
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl transition-all"
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-base bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl transition-all"
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                         initial={{ opacity: 0, x: 20 }}
@@ -543,7 +544,7 @@ export default function Header() {
           </div>
         )}
 
-        {/* Mobile Menu */}
+        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <>
@@ -552,152 +553,108 @@ export default function Header() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+                className="fixed inset-0 bg-black/30 z-[998] lg:hidden"
               />
 
-              {/* Menu Panel */}
+              {/* Dropdown Panel */}
               <motion.div
-                initial={{ x: "100%", opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: "100%", opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed top-28 md:top-32 right-0 bottom-0 w-[320px] max-w-[85vw] bg-white/98 backdrop-blur-xl shadow-2xl z-50 lg:hidden border-l border-gray-200/50 overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="fixed top-28 md:top-32 left-0 right-0 bg-white shadow-xl z-[999] lg:hidden border-t border-gray-100 overflow-y-auto max-h-[calc(100svh-7rem)] md:max-h-[calc(100svh-8rem)]"
               >
-                <div className="flex flex-col h-full p-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
                   {/* User Info (if logged in) */}
                   {isLoggedIn && (
-                    <div className="mb-6 pb-6 border-b border-gray-200/50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-orange-500 flex items-center justify-center text-white font-bold">
-                          {userName ? userName.charAt(0).toUpperCase() : "K"}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            {userName || "Kullanıcı"}
-                          </p>
-                          <p className="text-xs text-gray-600">Üye</p>
-                        </div>
+                    <div className="flex items-center gap-3 py-3 mb-1 border-b border-gray-100">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {userName ? userName.charAt(0).toUpperCase() : "K"}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 text-sm leading-tight">
+                          {userName || "Kullanıcı"}
+                        </p>
+                        <p className="text-xs text-gray-500">Üye</p>
                       </div>
                     </div>
                   )}
 
-                  {/* Navigation */}
-                  <nav className="flex flex-col gap-2 mb-6">
-                    {navItems.map((item, index) => {
+                  {/* Navigation Links */}
+                  <nav className="flex flex-col py-1">
+                    {navItems.map((item) => {
                       const isExternal = !item.href.startsWith("#");
                       return (
-                        <motion.div
-                          key={item.id}
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                        >
+                        <div key={item.id} className="border-b border-gray-50 last:border-0">
                           {isExternal ? (
                             <Link
                               href={item.href}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsMobileMenuOpen(false);
-                              }}
-                              className="block w-full"
-                            >
-                              <motion.div
-                                className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors cursor-pointer"
-                                whileTap={{ scale: 0.98 }}
-                              >
-                                {item.label}
-                              </motion.div>
-                            </Link>
-                          ) : (
-                            <motion.button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                scrollToSection(item.id);
-                              }}
-                              className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
-                              whileTap={{ scale: 0.98 }}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center justify-between w-full py-4 px-1 font-medium text-base text-gray-700 hover:text-orange-600 active:text-orange-700 transition-colors"
                             >
                               {item.label}
-                            </motion.button>
+                              <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            </Link>
+                          ) : (
+                            <button
+                              onClick={() => scrollToSection(item.id)}
+                              className="flex items-center justify-between w-full py-4 px-1 font-medium text-base text-gray-700 hover:text-orange-600 active:text-orange-700 transition-colors"
+                            >
+                              {item.label}
+                              <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            </button>
                           )}
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </nav>
 
-                  {/* CTA Buttons */}
+                  {/* Auth Buttons */}
                   {!isLoggedIn ? (
-                    <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-gray-200/50">
+                    <div className="flex flex-col gap-2.5 py-4 border-t border-gray-100">
                       <Link
                         href="/login"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="block w-full"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors"
                       >
-                        <motion.div
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all cursor-pointer"
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <LogIn className="w-5 h-5" />
-                          Giriş Yap
-                        </motion.div>
+                        <LogIn className="w-4 h-4" />
+                        Giriş Yap
                       </Link>
                       <Link
                         href="/signup"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="block w-full"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md active:opacity-90 transition-all"
                       >
-                        <motion.div
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg cursor-pointer"
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <UserPlus className="w-5 h-5" />
-                          Üye Ol
-                          <ArrowRight className="w-5 h-5" />
-                        </motion.div>
+                        <UserPlus className="w-4 h-4" />
+                        Üye Ol
+                        <ArrowRight className="w-4 h-4" />
                       </Link>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-gray-200/50">
+                    <div className="flex flex-col gap-2.5 py-4 border-t border-gray-100">
                       {userEmail &&
-                        userEmail.toLowerCase() ===
-                          "tetikmehmet930@gmail.com" && (
+                        userEmail.toLowerCase() === "tetikmehmet930@gmail.com" && (
                           <Link
                             href="/yonetim-paneli"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsMobileMenuOpen(false);
-                            }}
-                            className="block w-full"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 active:bg-gray-100 transition-colors"
                           >
-                            <motion.div
-                              className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-gray-700 border border-gray-300 bg-white hover:bg-gray-50 transition-all cursor-pointer"
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <Settings className="w-5 h-5" />
-                              Ayarlar
-                            </motion.div>
+                            <Settings className="w-4 h-4" />
+                            Ayarlar
                           </Link>
                         )}
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                      <button
+                        onClick={() => {
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all"
-                        whileTap={{ scale: 0.98 }}
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 transition-colors border border-red-200"
                       >
-                        <LogOut className="w-5 h-5" />
+                        <LogOut className="w-4 h-4" />
                         Çıkış Yap
-                      </motion.button>
+                      </button>
                     </div>
                   )}
                 </div>

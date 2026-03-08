@@ -207,10 +207,8 @@ export default function Footer({ fixed = false }) {
           <div className="mt-8 pt-5 border-t border-blue-200/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-gray-600">
             <p className="text-center sm:text-left">
               © {new Date().getFullYear()}{" "}
-              <span className="font-semibold text-gray-800">
-                Hızlı Okuma Uygulaması
-              </span>
-              . Tüm hakları saklıdır.
+              <span className="font-semibold text-gray-800">odakanatolia</span>.
+              Tüm hakları saklıdır.
             </p>
             <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-1">
               <span className="text-[11px] sm:text-xs text-gray-500">

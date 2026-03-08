@@ -238,7 +238,7 @@ export default function HakkimizdaPage() {
                 </div>
                 <div>
                   <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-                    SpeedMind Programı
+                    OdakAnatolia Programı
                   </h2>
                   <p className="text-gray-600 mt-1">
                     Hızlı okumanın ötesine geçen zihinsel gelişim
@@ -252,9 +252,7 @@ export default function HakkimizdaPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.6 }}
               >
-                Geliştirdiğimiz{" "}
-                <span className="font-bold text-orange-600">SpeedMind</span>{" "}
-                programı; hızlı okumanın ötesine geçerek{" "}
+                Geliştirdiğimiz program; hızlı okumanın ötesine geçerek{" "}
                 <span className="font-semibold text-indigo-600">
                   zihinsel odak
                 </span>
@@ -281,7 +279,7 @@ export default function HakkimizdaPage() {
               transition={{ delay: 0.8 }}
             >
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                SpeedMind Özellikleri
+                Özellikler
               </h2>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                 Bilimsel ve uygulamalı teknikler üzerine inşa edilmiş özellikler
@@ -338,10 +336,10 @@ export default function HakkimizdaPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.4, duration: 0.6 }}
               >
-                SpeedMind; okuma hızını artırırken anlama oranını koruyan, göz
-                ve beyin koordinasyonunu güçlendiren, iç seslendirmeyi azaltan,
-                dikkat ve konsantrasyonu sürdürülebilir hâle getiren bilimsel ve
-                uygulamalı teknikler üzerine inşa edilmiştir.
+                OdakAnatolia; okuma hızını artırırken anlama oranını koruyan,
+                göz ve beyin koordinasyonunu güçlendiren, iç seslendirmeyi
+                azaltan, dikkat ve konsantrasyonu sürdürülebilir hâle getiren
+                bilimsel ve uygulamalı teknikler üzerine inşa edilmiştir.
               </motion.p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -445,8 +443,8 @@ export default function HakkimizdaPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 2.5, duration: 0.6 }}
               >
-                SpeedMind ile hedefimiz; sadece daha hızlı okuyan değil, daha
-                bilinçli düşünen bireyler yetiştirmektir.
+                OdakAnatoliaS ile hedefimiz; sadece daha hızlı okuyan değil,
+                daha bilinçli düşünen bireyler yetiştirmektir.
               </motion.p>
             </div>
           </motion.section>
@@ -502,7 +500,7 @@ export default function HakkimizdaPage() {
                     backgroundSize: "200%",
                   }}
                 >
-                  SpeedMind ile zihninizi hızlandırın.
+                  Zihninizi hızlandırın.
                 </motion.p>
               </div>
 
